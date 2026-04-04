@@ -1,88 +1,70 @@
-"""Simple WebSocket chat server using Qwen Code API directly."""
+"""WebSocket bridge — bridges browser chat to nanobot gateway."""
 
 import asyncio
 import json
 import os
-import urllib.request
-import urllib.error
+import uuid
 import websockets
 from websockets.asyncio.server import serve
 
-LLM_API_KEY = os.environ.get("LLM_API_KEY", "demo-key")
-LLM_API_BASE = os.environ.get("LLM_API_BASE_URL", "http://qwen-code-api:8080/v1")
-LLM_MODEL = os.environ.get("LLM_API_MODEL", "coder-model")
-
-SYSTEM_PROMPT = """You are a helpful assistant for a game catalog website. 
-Help users discover games, find deals, and answer questions about games.
-Be concise and friendly."""
-
-
-def call_lllm(messages: list[dict]) -> str:
-    """Call the LLM API synchronously."""
-    payload = json.dumps({
-        "model": LLM_MODEL,
-        "messages": messages,
-        "max_tokens": 1024,
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        f"{LLM_API_BASE}/chat/completions",
-        data=payload,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {LLM_API_KEY}",
-        },
-        method="POST",
-    )
-
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        raw = resp.read()
-        result = json.loads(raw)
-        print(f"API response keys: {result.keys()}")
-        if "choices" in result and len(result["choices"]) > 0:
-            print(f"Choice keys: {result['choices'][0].keys()}")
-        return result["choices"][0]["message"]["content"]
+GATEWAY_HOST = os.environ.get("NANOBOT_GATEWAY_HOST", "localhost")
+GATEWAY_PORT = int(os.environ.get("NANOBOT_GATEWAY_PORT", 18790))
 
 
 async def handle_client(ws):
     """Handle a browser WebSocket connection."""
-    print("Client connected")
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    chat_id = str(uuid.uuid4())
+    print(f"Client connected: chat_id={chat_id}")
 
-    async for raw in ws:
-        try:
-            data = json.loads(raw)
-            user_message = data.get("content", data.get("message", "")).strip()
-            if not user_message:
-                continue
+    # Connect to nanobot gateway
+    gateway_url = f"ws://{GATEWAY_HOST}:{GATEWAY_PORT}"
+    try:
+        async with websockets.connect(gateway_url) as gateway_ws:
+            print(f"Connected to nanobot gateway at {gateway_url}")
 
-            print(f"User: {user_message}")
-            messages.append({"role": "user", "content": user_message})
+            # Forward messages from browser to gateway
+            async def from_browser():
+                async for raw in ws:
+                    try:
+                        data = json.loads(raw)
+                        content = data.get("content", data.get("message", "")).strip()
+                        if not content:
+                            continue
+                        print(f"User: {content}")
+                        # Nanobot webchat protocol: {content}
+                        await gateway_ws.send(json.dumps({"content": content}))
+                    except Exception as e:
+                        print(f"Error parsing browser message: {e}")
 
-            reply = await asyncio.to_thread(call_lllm, messages)
-            print(f"Bot reply length: {len(reply)}")
-            print(f"Bot: {reply[:200]}")
-            messages.append({"role": "assistant", "content": reply})
+            # Forward messages from gateway to browser
+            async def from_gateway():
+                async for raw in gateway_ws:
+                    try:
+                        data = json.loads(raw)
+                        # Nanobot sends structured messages: {type, content}
+                        content = data.get("content", str(data))
+                        print(f"Bot: {content[:200]}")
+                        await ws.send(json.dumps({
+                            "type": data.get("type", "text"),
+                            "content": content,
+                        }))
+                    except Exception as e:
+                        print(f"Error parsing gateway message: {e}")
 
-            payload = json.dumps({
-                "type": "text",
-                "content": reply,
-                "format": "markdown",
-            })
-            print(f"Sending to client: {len(payload)} bytes")
-            await ws.send(payload)
+            await asyncio.gather(from_browser(), from_gateway())
 
-        except Exception as e:
-            print(f"Error: {e}")
-            await ws.send(json.dumps({
-                "type": "text",
-                "content": f"Error: {str(e)}",
-            }))
+    except Exception as e:
+        print(f"Gateway connection error: {e}")
+        await ws.send(json.dumps({
+            "type": "text",
+            "content": f"Error connecting to assistant: {str(e)}",
+        }))
 
 
 async def main():
     port = int(os.environ.get("WEBSOCKET_PORT", 8765))
-    print(f"Chat server listening on :{port}")
+    print(f"WebSocket bridge listening on :{port}")
+    print(f"Forwarding to nanobot gateway at {GATEWAY_HOST}:{GATEWAY_PORT}")
     async with serve(handle_client, "0.0.0.0", port):
         await asyncio.Future()
 
