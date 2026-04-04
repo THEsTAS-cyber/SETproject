@@ -44,6 +44,11 @@ def main():
     for server_name in config.get("tools", {}).get("mcpServers", {}):
         config["tools"]["mcpServers"][server_name]["command"] = venv_python
 
+    # Load skill prompt if exists
+    skill_prompt_path = workspace_path / "skill_prompt.md"
+    if skill_prompt_path.exists():
+        config["agents"]["defaults"]["skill"] = skill_prompt_path.read_text()
+
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
 
