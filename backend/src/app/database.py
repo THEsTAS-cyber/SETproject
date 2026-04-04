@@ -4,6 +4,8 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.db.base import Base
+from app.models.game import Game  # noqa: F401 — register model
 from app.settings import settings
 
 engine = create_async_engine(

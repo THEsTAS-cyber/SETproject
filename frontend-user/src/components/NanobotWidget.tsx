@@ -47,9 +47,11 @@ export default function NanobotWidget() {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        // Nanobot structured message: {type, content} or simple {reply}
+        const content = data.content ?? data.reply ?? "…";
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: data.reply ?? "…" },
+          { role: "assistant", content },
         ]);
       } catch {
         setMessages((prev) => [
@@ -76,7 +78,7 @@ export default function NanobotWidget() {
     setLoading(true);
 
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ message: text }));
+      wsRef.current.send(JSON.stringify({ content: text }));
     }
   };
 
@@ -134,10 +136,10 @@ export default function NanobotWidget() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask something…"
-          disabled={loading || !connected}
+          placeholder={connected ? "Ask something…" : "Connecting…"}
+          disabled={loading}
         />
-        <button type="submit" disabled={loading || !input.trim() || !connected}>
+        <button type="submit" disabled={loading || !input.trim()}>
           Send
         </button>
       </form>

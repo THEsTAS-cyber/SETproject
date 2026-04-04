@@ -40,9 +40,9 @@ def create_app() -> FastAPI:
     async def health_check() -> dict[str, str]:
         return {"status": "ok", "service": settings.name}
 
-    # TODO: Include routers here
-    # from app.routers import items
-    # app.include_router(items.router, prefix="/items", tags=["items"])
+    # Include routers
+    from app.routers import games
+    app.include_router(games.router)
 
     return app
 
