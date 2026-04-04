@@ -20,13 +20,6 @@ RUN uv pip install mcp websockets aiohttp \
     "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
 
 # Ensure webchat is enabled in config
-RUN python -c "
-import json
-with open('/app/nanobot/config.json') as f:
-    c = json.load(f)
-c['channels']['webchat'] = {'enabled': True, 'allowFrom': ['*']}
-with open('/app/nanobot/config.json', 'w') as f:
-    json.dump(c, f, indent=2)
-"
+RUN python -c "import json; c=json.load(open('/app/nanobot/config.json')); c['channels']['webchat']={'enabled':True,'allowFrom':['*']}; json.dump(c,open('/app/nanobot/config.json','w'),indent=2)"
 
 CMD ["python", "/app/nanobot/entrypoint.py"]
