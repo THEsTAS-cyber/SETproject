@@ -29,7 +29,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: ${REGISTRY_PREFIX_DOCKER_HUB:-}postgres:18.3-alpine
+    image: ${REGISTRY_PREFIX_DOCKER_HUB:-}postgres:17-alpine
     restart: unless-stopped
     networks:
       - app-network
