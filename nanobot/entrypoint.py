@@ -29,6 +29,8 @@ def main():
     # Replace LMS MCP with games MCP
     if "lms" in config.get("tools", {}).get("mcpServers", {}):
         del config["tools"]["mcpServers"]["lms"]
+    if "obs" in config.get("tools", {}).get("mcpServers", {}):
+        del config["tools"]["mcpServers"]["obs"]
     config["tools"]["mcpServers"]["games"] = {
         "command": "/app/nanobot/.venv/bin/python",
         "args": ["-m", "mcp_games"],
@@ -51,6 +53,10 @@ def main():
 
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
+
+    # Clear any existing cron jobs
+    jobs_path = workspace_path / "jobs.json"
+    jobs_path.write_text("[]")
 
     nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
     os.execv(nanobot_bin, [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)])
