@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Resolve environment variables into config and launch nanobot gateway + websocket bridge."""
+"""Launch nanobot gateway + websocket bridge together."""
 
 import json
 import os
+import signal
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -28,7 +30,7 @@ def main():
     if gateway_port := os.environ.get("NANOBOT_GATEWAY_CONTAINER_PORT"):
         config["gateway"]["port"] = int(gateway_port)
 
-    # MCP servers — set venv Python if present
+    # MCP servers — set venv Python
     venv_python = "/app/nanobot/.venv/bin/python"
     for server_name in config.get("tools", {}).get("mcpServers", {}):
         config["tools"]["mcpServers"][server_name]["command"] = venv_python
@@ -36,17 +38,32 @@ def main():
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
 
-    # Launch gateway in background
-    nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
+    # Launch gateway
     gateway_port = config["gateway"]["port"]
+    nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
     print(f"Starting nanobot gateway on port {gateway_port}...")
-    subprocess.Popen(
+    gateway_proc = subprocess.Popen(
         [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)],
     )
 
-    # Launch websocket bridge in foreground
+    # Wait for gateway to be ready
+    print("Waiting for gateway...")
+    time.sleep(10)
     print("Starting websocket bridge...")
-    os.execv(venv_python, [venv_python, "/app/nanobot/websocket_bridge.py"])
+
+    # Launch bridge in foreground
+    bridge_proc = subprocess.Popen(
+        [venv_python, "/app/nanobot/websocket_bridge.py"],
+    )
+
+    # Wait for either process to exit
+    try:
+        gateway_proc.wait()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        bridge_proc.terminate()
+        gateway_proc.terminate()
 
 
 if __name__ == "__main__":
