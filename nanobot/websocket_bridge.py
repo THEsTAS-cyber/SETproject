@@ -3,7 +3,8 @@
 import asyncio
 import json
 import os
-import httpx
+import urllib.request
+import urllib.error
 import websockets
 from websockets.asyncio.server import serve
 
@@ -14,6 +15,29 @@ LLM_MODEL = os.environ.get("LLM_API_MODEL", "coder-model")
 SYSTEM_PROMPT = """You are a helpful assistant for a game catalog website. 
 Help users discover games, find deals, and answer questions about games.
 Be concise and friendly."""
+
+
+def call_lllm(messages: list[dict]) -> str:
+    """Call the LLM API synchronously."""
+    payload = json.dumps({
+        "model": LLM_MODEL,
+        "messages": messages,
+        "max_tokens": 1024,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        f"{LLM_API_BASE}/chat/completions",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {LLM_API_KEY}",
+        },
+        method="POST",
+    )
+
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        result = json.loads(resp.read())
+        return result["choices"][0]["message"]["content"]
 
 
 async def handle_client(ws):
@@ -31,27 +55,10 @@ async def handle_client(ws):
             print(f"User: {user_message}")
             messages.append({"role": "user", "content": user_message})
 
-            async with httpx.AsyncClient(timeout=120) as client:
-                resp = await client.post(
-                    f"{LLM_API_BASE}/chat/completions",
-                    headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {LLM_API_KEY}",
-                    },
-                    json={
-                        "model": LLM_MODEL,
-                        "messages": messages,
-                        "max_tokens": 1024,
-                    },
-                )
-                resp.raise_for_status()
-                result = resp.json()
-                reply = result["choices"][0]["message"]["content"]
-
+            reply = await asyncio.to_thread(call_lllm, messages)
             print(f"Bot: {reply}")
             messages.append({"role": "assistant", "content": reply})
 
-            # Send as nanobot structured message
             await ws.send(json.dumps({
                 "type": "text",
                 "content": reply,
