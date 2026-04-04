@@ -36,7 +36,11 @@ def call_lllm(messages: list[dict]) -> str:
     )
 
     with urllib.request.urlopen(req, timeout=120) as resp:
-        result = json.loads(resp.read())
+        raw = resp.read()
+        result = json.loads(raw)
+        print(f"API response keys: {result.keys()}")
+        if "choices" in result and len(result["choices"]) > 0:
+            print(f"Choice keys: {result['choices'][0].keys()}")
         return result["choices"][0]["message"]["content"]
 
 
@@ -56,14 +60,17 @@ async def handle_client(ws):
             messages.append({"role": "user", "content": user_message})
 
             reply = await asyncio.to_thread(call_lllm, messages)
-            print(f"Bot: {reply}")
+            print(f"Bot reply length: {len(reply)}")
+            print(f"Bot: {reply[:200]}")
             messages.append({"role": "assistant", "content": reply})
 
-            await ws.send(json.dumps({
+            payload = json.dumps({
                 "type": "text",
                 "content": reply,
                 "format": "markdown",
-            }))
+            })
+            print(f"Sending to client: {len(payload)} bytes")
+            await ws.send(payload)
 
         except Exception as e:
             print(f"Error: {e}")
