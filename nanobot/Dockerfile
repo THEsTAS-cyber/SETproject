@@ -14,7 +14,7 @@ RUN cp config.template.json config.json
 RUN uv venv
 
 # Install nanobot-ai + websockets + mcp-games
-COPY ../mcp/mcp-games /tmp/mcp-games
+COPY --from=workspace /mcp/mcp-games /tmp/mcp-games
 RUN uv pip install mcp websockets /tmp/mcp-games "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
 
 # Run gateway in background + websocket bridge on port 8765
