@@ -11,7 +11,7 @@ GATEWAY_HOST = os.environ.get("NANOBOT_GATEWAY_HOST", "0.0.0.0")
 GATEWAY_PORT = int(os.environ.get("NANOBOT_GATEWAY_PORT", 18790))
 
 
-async def wait_for_gateway(retries=30, delay=2):
+async def wait_for_gateway(retries=15, delay=1):
     """Wait until nanobot gateway is ready."""
     for i in range(retries):
         try:

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Resolve environment variables into config and launch nanobot gateway.
-
-Simplified for ProjectSET — without MCP packages.
-Add MCP servers back when you install mcp-lms / mcp-obs.
-"""
+"""Resolve environment variables into config and launch nanobot gateway + websocket bridge."""
 
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -38,8 +36,17 @@ def main():
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
 
+    # Launch gateway in background
     nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
-    os.execv(nanobot_bin, [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)])
+    gateway_port = config["gateway"]["port"]
+    print(f"Starting nanobot gateway on port {gateway_port}...")
+    subprocess.Popen(
+        [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)],
+    )
+
+    # Launch websocket bridge in foreground
+    print("Starting websocket bridge...")
+    os.execv(venv_python, [venv_python, "/app/nanobot/websocket_bridge.py"])
 
 
 if __name__ == "__main__":
