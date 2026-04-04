@@ -9,10 +9,16 @@ COPY workspace/ ./workspace/
 
 RUN uv venv
 
-# Install nanobot-ai + nanobot-websocket-channel + mcp-games
+# Copy source packages
 COPY --from=workspace /mcp/mcp-games /tmp/mcp-games
 COPY --from=workspace /nanobot-websocket-channel/nanobot-webchat /tmp/nanobot-webchat
 COPY --from=workspace /nanobot-websocket-channel/nanobot-channel-protocol /tmp/nanobot-channel-protocol
+
+# Remove workspace source references from copied packages
+RUN sed -i '/\[tool.uv.sources\]/,/^\[/d' /tmp/nanobot-webchat/pyproject.toml && \
+    sed -i '/\[tool.uv.sources\]/,/^\[/d' /tmp/mcp-games/pyproject.toml
+
+# Install in dependency order
 RUN uv pip install mcp websockets aiohttp \
     /tmp/nanobot-channel-protocol \
     /tmp/nanobot-webchat \
