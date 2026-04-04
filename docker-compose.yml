@@ -108,8 +108,6 @@ services:
   qwen-code-api:
     build:
       context: ./qwen-code-api
-      additional_contexts:
-        workspace: .
     restart: unless-stopped
     networks:
       - app-network
