@@ -5,8 +5,11 @@ ARG REGISTRY_PREFIX_DOCKER_HUB
 FROM ${REGISTRY_PREFIX_DOCKER_HUB:-}ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 WORKDIR /app/nanobot
-COPY config.template.json config.json pyproject.toml entrypoint.py ./
+COPY config.template.json pyproject.toml entrypoint.py ./
 COPY workspace/ ./workspace/
+
+# Use template as default config
+RUN cp config.template.json config.json
 
 RUN uv venv
 
