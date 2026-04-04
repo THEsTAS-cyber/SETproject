@@ -1,110 +1,172 @@
 """MCP server for game catalog queries."""
 
-import os
+from __future__ import annotations
+
+import asyncio
 import json
+from typing import Any
+
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import TextContent, Tool
+from pydantic import BaseModel, Field
+
 import urllib.request
-from mcp.server.fastmcp import FastMCP
+import os
 
 BACKEND_URL = os.environ.get("NANOBOT_LMS_BACKEND_URL", "http://backend:8000")
 
-mcp = FastMCP("game-catalog")
 
-
-@mcp.tool()
-def list_games(genre: str | None = None) -> str:
-    """List all games from the catalog. Optionally filter by genre.
-    
-    Args:
-        genre: Optional genre filter (e.g. "RPG", "Action", "Sports")
-    
-    Returns:
-        JSON string with game list including title, price, genres, rating
-    """
-    url = f"{BACKEND_URL}/api/games?limit=50"
-    if genre:
-        url += f"&genre={genre}"
-    
+def _fetch(path: str, params: dict | None = None) -> list[dict]:
+    url = f"{BACKEND_URL}{path}"
+    if params:
+        qs = "&".join(f"{k}={v}" for k, v in params.items())
+        url += f"?{qs}"
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req, timeout=30) as resp:
-        games = json.loads(resp.read())
-    
+        return json.loads(resp.read())
+
+
+# ── Tool schemas ──
+
+class NoArgs(BaseModel):
+    pass
+
+
+class GenreQuery(BaseModel):
+    genre: str = Field(description="Genre filter, e.g. 'RPG', 'Action'")
+
+
+class SearchQuery(BaseModel):
+    q: str = Field(description="Search term for title or description")
+
+
+class CheapestQuery(BaseModel):
+    limit: int = Field(default=5, ge=1, description="Number of cheapest games to return")
+
+
+# ── Handlers ──
+
+async def _list_games(_args: BaseModel) -> str:
+    games = _fetch("/api/games")
     if not games:
-        return "No games found."
-    
-    lines = []
-    for g in games:
-        line = f"- {g['title']} — ${g['price']:.2f}"
-        if g.get("genres"):
-            line += f" [{', '.join(g['genres'])}]"
-        if g.get("rating"):
-            line += f" ★{g['rating']:.1f}"
-        lines.append(line)
-    
+        return "No games in catalog."
+    lines = [f"- {g['title']} — ${g['price']:.2f} [{', '.join(g.get('genres', []))}]" for g in games[:20]]
     return "\n".join(lines)
 
 
-@mcp.tool()
-def search_games(query: str) -> str:
-    """Search games by title or description.
-    
-    Args:
-        query: Search term
-    
-    Returns:
-        JSON string with matching games
-    """
-    url = f"{BACKEND_URL}/api/games/search/?q={query}"
-    
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        games = json.loads(resp.read())
-    
+async def _list_by_genre(args: BaseModel) -> str:
+    games = _fetch("/api/games", params={"genre": args.genre})
     if not games:
-        return f"No games found matching '{query}'."
-    
-    lines = []
-    for g in games:
-        line = f"- {g['title']} — ${g['price']:.2f}"
-        if g.get("genres"):
-            line += f" [{', '.join(g['genres'])}]"
-        if g.get("rating"):
-            line += f" ★{g['rating']:.1f}"
-        lines.append(line)
-    
+        return f"No games found for genre '{args.genre}'."
+    lines = [f"- {g['title']} — ${g['price']:.2f}" for g in games[:20]]
     return "\n".join(lines)
 
 
-@mcp.tool()
-def cheapest_games(limit: int = 5) -> str:
-    """Get the cheapest games from the catalog.
-    
-    Args:
-        limit: Number of games to return (default 5)
-    
-    Returns:
-        JSON string with cheapest games
-    """
-    url = f"{BACKEND_URL}/api/games?limit=100"
-    
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        games = json.loads(resp.read())
-    
+async def _search_games(args: BaseModel) -> str:
+    games = _fetch("/api/games/search/", params={"q": args.q})
     if not games:
-        return "No games found."
-    
+        return f"No games found matching '{args.q}'."
+    lines = [f"- {g['title']} — ${g['price']:.2f} [{', '.join(g.get('genres', []))}]" for g in games[:10]]
+    return "\n".join(lines)
+
+
+async def _cheapest_games(args: BaseModel) -> str:
+    games = _fetch("/api/games", params={"limit": 200})
+    if not games:
+        return "No games in catalog."
     games.sort(key=lambda g: g["price"])
-    cheapest = games[:limit]
-    
-    lines = []
-    for g in cheapest:
-        line = f"- {g['title']} — ${g['price']:.2f}"
-        if g.get("genres"):
-            line += f" [{', '.join(g['genres'])}]"
-        lines.append(line)
-    
+    lines = [f"- {g['title']} — ${g['price']:.2f}" for g in games[:args.limit]]
     return "\n".join(lines)
+
+
+# ── Tool registry ──
+
+from dataclasses import dataclass
+from collections.abc import Awaitable, Callable
+from mcp.types import Tool as MCPTool
+
+ToolPayload = str
+ToolHandler = Callable[[BaseModel], Awaitable[ToolPayload]]
+
+
+@dataclass(frozen=True, slots=True)
+class ToolSpec:
+    name: str
+    description: str
+    model: type[BaseModel]
+    handler: ToolHandler
+
+    def as_tool(self) -> MCPTool:
+        schema = self.model.model_json_schema()
+        schema.pop("$defs", None)
+        schema.pop("title", None)
+        return MCPTool(name=self.name, description=self.description, inputSchema=schema)
+
+
+TOOL_SPECS = (
+    ToolSpec(
+        "list_games",
+        "List all games from the catalog (up to 20). Returns title, price, genres.",
+        NoArgs,
+        _list_games,
+    ),
+    ToolSpec(
+        "list_games_by_genre",
+        "List games filtered by genre.",
+        GenreQuery,
+        _list_by_genre,
+    ),
+    ToolSpec(
+        "search_games",
+        "Search games by title or description.",
+        SearchQuery,
+        _search_games,
+    ),
+    ToolSpec(
+        "cheapest_games",
+        "Get the cheapest games from the catalog.",
+        CheapestQuery,
+        _cheapest_games,
+    ),
+)
+
+TOOLS_BY_NAME = {spec.name: spec for spec in TOOL_SPECS}
+
+
+# ── Server ──
+
+def create_server() -> Server:
+    server = Server("game-catalog")
+
+    @server.list_tools()
+    async def list_tools() -> list[MCPTool]:
+        return [spec.as_tool() for spec in TOOL_SPECS]
+
+    @server.call_tool()
+    async def call_tool(
+        name: str, arguments: dict[str, Any] | None
+    ) -> list[TextContent]:
+        spec = TOOLS_BY_NAME.get(name)
+        if spec is None:
+            return [TextContent(type="text", text=f"Unknown tool: {name}")]
+        try:
+            args = spec.model.model_validate(arguments or {})
+            result = await spec.handler(args)
+            return [TextContent(type="text", text=result)]
+        except Exception as exc:
+            return [TextContent(type="text", text=f"Error: {type(exc).__name__}: {exc}")]
+
+    _ = list_tools, call_tool
+    return server
+
+
+async def main() -> None:
+    server = create_server()
+    async with stdio_server() as (read_stream, write_stream):
+        init_options = server.create_initialization_options()
+        await server.run(read_stream, write_stream, init_options)
 
 
 if __name__ == "__main__":
-    mcp.run()
+    asyncio.run(main())
