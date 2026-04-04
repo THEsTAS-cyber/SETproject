@@ -18,7 +18,7 @@
 
     # Nanobot WebSocket — /ws/chat → nanobot
     handle /ws/chat {
-        reverse_proxy http://nanobot:{$NANOBOT_CONTAINER_PORT:-8765}
+        reverse_proxy http://nanobot:8765
     }
 
     # User panel — everything else → frontend-user
