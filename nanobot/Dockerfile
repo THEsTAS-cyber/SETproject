@@ -17,4 +17,4 @@ RUN uv venv
 RUN uv pip install mcp websockets "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
 
 # Run gateway in background + websocket bridge on port 8765
-CMD ["sh", "-c", "python /app/nanobot/entrypoint.py & sleep 5 && WEBSOCKET_PORT=8765 python /app/nanobot/websocket_bridge.py"]
+CMD ["sh", "-c", "python /app/nanobot/entrypoint.py & sleep 5 && /app/nanobot/.venv/bin/python /app/nanobot/websocket_bridge.py"]
