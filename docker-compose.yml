@@ -10,7 +10,7 @@ services:
     ports:
       - ${BACKEND_HOST_ADDRESS:-127.0.0.1}:${BACKEND_HOST_PORT:-42001}:${BACKEND_CONTAINER_PORT:-8000}
     environment:
-      - NAME=${BACKEND_NAME:-'App Service'}
+      - NAME=${BACKEND_NAME:-App Service}
       - DEBUG=${BACKEND_DEBUG:-false}
       - ADDRESS=${BACKEND_CONTAINER_ADDRESS:-0.0.0.0}
       - PORT=${BACKEND_CONTAINER_PORT:-8000}
@@ -21,9 +21,9 @@ services:
       - CORS_ORIGINS=${BACKEND_CORS_ORIGINS:-[]}
       - DB_HOST=${CONST_POSTGRESQL_SERVICE_NAME:-postgres}
       - DB_PORT=${CONST_POSTGRESQL_DEFAULT_PORT:-5432}
-      - DB_NAME=${POSTGRES_DB:-'db-app'}
-      - DB_USER=${POSTGRES_USER:-'postgres'}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-'postgres'}
+      - DB_NAME=${POSTGRES_DB:-db-app}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,9 +34,9 @@ services:
     networks:
       - app-network
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-'db-app'}
-      - POSTGRES_USER=${POSTGRES_USER:-'postgres'}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-'postgres'}
+      - POSTGRES_DB=${POSTGRES_DB:-db-app}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     ports:
       - ${POSTGRES_HOST_ADDRESS:-127.0.0.1}:${POSTGRES_HOST_PORT:-42004}:${CONST_POSTGRESQL_DEFAULT_PORT:-5432}
     volumes:
@@ -58,8 +58,8 @@ services:
     networks:
       - app-network
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-'admin@example.com'}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-'admin'}
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@example.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
     ports:
       - ${PGADMIN_HOST_ADDRESS:-127.0.0.1}:${PGADMIN_HOST_PORT:-42003}:80
     depends_on:
