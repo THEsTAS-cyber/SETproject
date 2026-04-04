@@ -8,7 +8,7 @@ from app.database import get_db_session
 from app.models.game import Game
 from app.schemas.game import GameCreate, GameOut
 
-router = APIRouter(prefix="/games", tags=["games"])
+router = APIRouter(prefix="/api/games", tags=["games"])
 
 
 @router.post("", response_model=GameOut, status_code=201)
@@ -24,7 +24,7 @@ async def create_game(
     return game
 
 
-@router.get("/", response_model=list[GameOut])
+@router.get("", response_model=list[GameOut])
 async def list_games(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),

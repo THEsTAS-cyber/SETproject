@@ -5,16 +5,12 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
-        destination: `${process.env.BACKEND_URL || "http://backend:8000"}/:path*`,
+        source: "/api/games",
+        destination: `${process.env.BACKEND_URL || "http://backend:8000"}/api/games`,
       },
       {
-        source: "/games/:path*",
-        destination: `${process.env.BACKEND_URL || "http://backend:8000"}/games/:path*`,
-      },
-      {
-        source: "/games",
-        destination: `${process.env.BACKEND_URL || "http://backend:8000"}/games`,
+        source: "/api/games/:path*",
+        destination: `${process.env.BACKEND_URL || "http://backend:8000"}/api/games/:path*`,
       },
     ];
   },
