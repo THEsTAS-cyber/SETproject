@@ -13,7 +13,8 @@ RUN cp config.template.json config.json
 
 RUN uv venv
 
-# Install nanobot-ai (the core framework)
-RUN uv pip install mcp "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
+# Install nanobot-ai + websockets + httpx
+RUN uv pip install mcp websockets httpx "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
 
-CMD ["python", "/app/nanobot/entrypoint.py"]
+# Run gateway in background + websocket bridge on port 8765
+CMD ["sh", "-c", "python /app/nanobot/entrypoint.py & sleep 5 && WEBSOCKET_PORT=8765 python /app/nanobot/websocket_bridge.py"]
