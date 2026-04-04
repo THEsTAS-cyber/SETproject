@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve environment variables into config.json. Does NOT start anything."""
+"""Resolve environment variables into config and launch nanobot gateway."""
 
 import json
 import os
@@ -9,6 +9,7 @@ from pathlib import Path
 def main():
     config_path = Path("/app/nanobot/config.json")
     resolved_path = Path("/tmp/config.resolved.json")
+    workspace_path = Path("/app/nanobot/workspace")
 
     with open(config_path) as f:
         config = json.load(f)
@@ -25,7 +26,20 @@ def main():
     if gateway_port := os.environ.get("NANOBOT_GATEWAY_CONTAINER_PORT"):
         config["gateway"]["port"] = int(gateway_port)
 
-    # MCP servers — set venv Python
+    # Replace LMS MCP with games MCP
+    if "lms" in config.get("tools", {}).get("mcpServers", {}):
+        del config["tools"]["mcpServers"]["lms"]
+    config["tools"]["mcpServers"]["games"] = {
+        "command": "/app/nanobot/.venv/bin/python",
+        "args": ["-m", "mcp_games"],
+        "env": {
+            "NANOBOT_LMS_BACKEND_URL": os.environ.get(
+                "NANOBOT_LMS_BACKEND_URL", "http://backend:8000"
+            )
+        }
+    }
+
+    # Set venv Python for all MCP servers
     venv_python = "/app/nanobot/.venv/bin/python"
     for server_name in config.get("tools", {}).get("mcpServers", {}):
         config["tools"]["mcpServers"][server_name]["command"] = venv_python
@@ -33,7 +47,8 @@ def main():
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
 
-    print(f"Config written to {resolved_path}")
+    nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
+    os.execv(nanobot_bin, [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)])
 
 
 if __name__ == "__main__":
