@@ -7,8 +7,26 @@ import uuid
 import websockets
 from websockets.asyncio.server import serve
 
-GATEWAY_HOST = os.environ.get("NANOBOT_GATEWAY_HOST", "localhost")
+GATEWAY_HOST = os.environ.get("NANOBOT_GATEWAY_HOST", "0.0.0.0")
 GATEWAY_PORT = int(os.environ.get("NANOBOT_GATEWAY_PORT", 18790))
+
+
+async def wait_for_gateway(retries=30, delay=2):
+    """Wait until nanobot gateway is ready."""
+    for i in range(retries):
+        try:
+            _, writer = await asyncio.wait_for(
+                asyncio.open_connection(GATEWAY_HOST, GATEWAY_PORT),
+                timeout=2,
+            )
+            writer.close()
+            await writer.wait_closed()
+            print(f"Gateway ready after {i * delay}s")
+            return True
+        except Exception:
+            print(f"Gateway not ready yet (attempt {i+1}/{retries})...")
+            await asyncio.sleep(delay)
+    return False
 
 
 async def handle_client(ws):
@@ -65,6 +83,12 @@ async def main():
     port = int(os.environ.get("WEBSOCKET_PORT", 8765))
     print(f"WebSocket bridge listening on :{port}")
     print(f"Forwarding to nanobot gateway at {GATEWAY_HOST}:{GATEWAY_PORT}")
+
+    # Wait for gateway to be ready
+    if not await wait_for_gateway():
+        print("ERROR: Gateway not available, exiting")
+        return
+
     async with serve(handle_client, "0.0.0.0", port):
         await asyncio.Future()
 
