@@ -18,8 +18,7 @@ export default function RootLayout({
         <header className="header">
           <nav>
             <a href="/">Home</a>
-            <a href="/profile">Profile</a>
-            <a href="/items">Items</a>
+            <a href="/games">Games</a>
           </nav>
         </header>
         <main>{children}</main>
