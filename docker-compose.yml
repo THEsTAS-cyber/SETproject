@@ -90,7 +90,6 @@ services:
     ports:
       - ${NANOBOT_HOST_ADDRESS:-127.0.0.1}:${NANOBOT_HOST_PORT:-42006}:${NANOBOT_CONTAINER_PORT:-8765}
     volumes:
-      - ./nanobot/config.json:/app/nanobot/config.json:ro
       - ./nanobot/workspace:/app/nanobot/workspace
     environment:
       - LLM_API_KEY=${LLM_API_KEY:-demo-key}
@@ -125,6 +124,7 @@ services:
       - QWEN_CODE_AUTH_USE=${QWEN_CODE_API_AUTH_USE:-true}
       - LOG_REQUESTS=${QWEN_CODE_API_LOG_REQUESTS:-true}
       - QWEN_CODE_API_KEY=${QWEN_CODE_API_KEY:-}
+    command: ["python", "-m", "qwen_code_api.main"]
     healthcheck:
       test:
         - CMD
