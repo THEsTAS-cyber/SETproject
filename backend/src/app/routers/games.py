@@ -11,7 +11,7 @@ from app.schemas.game import GameCreate, GameOut
 router = APIRouter(prefix="/games", tags=["games"])
 
 
-@router.post("/", response_model=GameOut, status_code=201)
+@router.post("", response_model=GameOut, status_code=201)
 async def create_game(
     data: GameCreate,
     db: AsyncSession = Depends(get_db_session),
