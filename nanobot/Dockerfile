@@ -1,18 +1,32 @@
 # Adapted from se-toolkit-lab-8
-# Simplified for ProjectSET — without MCP packages
 
 ARG REGISTRY_PREFIX_DOCKER_HUB
 FROM ${REGISTRY_PREFIX_DOCKER_HUB:-}ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 WORKDIR /app/nanobot
-COPY config.template.json pyproject.toml entrypoint.py websocket_bridge.py ./
+COPY config.template.json config.json pyproject.toml entrypoint.py ./
 COPY workspace/ ./workspace/
-
-# Use template as default config
-RUN cp config.template.json config.json
 
 RUN uv venv
 
-# Install nanobot-ai + websockets + mcp-games
+# Install nanobot-ai + nanobot-websocket-channel + mcp-games
 COPY --from=workspace /mcp/mcp-games /tmp/mcp-games
-RUN uv pip install mcp websockets /tmp/mcp-games "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
+COPY --from=workspace /nanobot-websocket-channel/nanobot-webchat /tmp/nanobot-webchat
+COPY --from=workspace /nanobot-websocket-channel/nanobot-channel-protocol /tmp/nanobot-channel-protocol
+RUN uv pip install mcp websockets aiohttp \
+    /tmp/nanobot-channel-protocol \
+    /tmp/nanobot-webchat \
+    /tmp/mcp-games \
+    "nanobot-ai @ https://github.com/HKUDS/nanobot/archive/e7d371ec1e6531b28898ec2c869ef338e8dd46ec.zip"
+
+# Ensure webchat is enabled in config
+RUN python -c "
+import json
+with open('/app/nanobot/config.json') as f:
+    c = json.load(f)
+c['channels']['webchat'] = {'enabled': True, 'allowFrom': ['*']}
+with open('/app/nanobot/config.json', 'w') as f:
+    json.dump(c, f, indent=2)
+"
+
+CMD ["python", "/app/nanobot/entrypoint.py"]
