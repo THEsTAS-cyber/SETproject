@@ -33,25 +33,14 @@ class Settings(BaseSettings):
     )
     pspricing_regions: list[str] = Field(
         default=[
-            # === Основные рынки ===
-            "us", "gb", "de", "fr", "jp", "au",
-            # === Восточная Европа ===
-            "ua", "pl",
-            # === Дешёвые регионы (лучшие цены) ===
-            "tr", "ar", "th", "in", "za", "id", "ph", "mx",
-            # === Европа ===
-            "es", "it", "nl", "be", "at", "ch", "se", "no", "dk", "fi",
-            "pt", "ie", "cz", "hu", "ro",
-            # === Азия ===
-            "hk", "kr", "tw", "sg",
-            # === Ближний Восток ===
-            "sa", "ae", "il",
-            # === Северная Америка ===
-            "ca",
-            # === Южная Америка ===
-            "br", "cl", "co", "pe",
-            # === Океания ===
-            "nz",
+            # === PSPricing B2B API — все 70 поддерживаемых регионов ===
+            "ae", "ar", "at", "au", "be", "bg", "bh", "bo", "br", "ca",
+            "ch", "cl", "cn", "co", "cr", "cy", "cz", "de", "dk", "ec",
+            "es", "fi", "fr", "gb", "gr", "gt", "hk", "hn", "hr", "hu",
+            "id", "ie", "il", "in", "is", "it", "jp", "kr", "kw", "lb",
+            "lu", "mt", "mx", "my", "ni", "nl", "no", "nz", "om", "pa",
+            "pe", "pl", "pt", "py", "qa", "ro", "ru", "sa", "se", "sg",
+            "si", "sk", "sv", "th", "tr", "tw", "ua", "us", "uy", "za",
         ],
         alias="PSPRICING_REGIONS",
     )

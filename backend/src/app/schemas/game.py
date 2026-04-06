@@ -84,36 +84,21 @@ _PS_STORE_BASE = "https://store.playstation.com"
 
 # Region code → PS Store locale prefix
 _REGION_STORE_MAP: dict[str, str] = {
-    # Основные
-    "us": "en-US", "gb": "en-GB", "de": "de-DE", "fr": "fr-FR", "jp": "ja-JP", "au": "en-AU",
-    # Восточная Европа
-    "ua": "uk-UA", "pl": "pl-PL", "ru": "ru-RU", "kz": "ru-KZ", "by": "ru-BY",
-    # Дешёвые
-    "tr": "tr-TR", "ar": "es-AR", "th": "th-TH", "in": "en-IN", "eg": "ar-EG",
-    "ng": "en-NG", "za": "en-ZA", "id": "id-ID", "ph": "en-PH", "mx": "es-MX",
-    # Европа
-    "es": "es-ES", "it": "it-IT", "nl": "nl-NL", "be": "nl-BE", "at": "de-AT",
-    "ch": "de-CH", "se": "sv-SE", "no": "no-NO", "dk": "da-DK", "fi": "fi-FI",
-    "pt": "pt-PT", "ie": "en-IE", "cz": "cs-CZ", "hu": "hu-HU", "ro": "ro-RO",
-    "bg": "bg-BG", "hr": "hr-HR", "sk": "sk-SK", "si": "sl-SI", "lt": "lt-LT",
-    "lv": "lv-LV", "ee": "et-EE", "lu": "de-LU", "mt": "en-MT", "cy": "el-CY",
-    "is": "en-IS", "gr": "el-GR",
-    # Азия
-    "hk": "zh-HK", "kr": "ko-KR", "tw": "zh-TW", "sg": "en-SG", "my": "en-MY", "vn": "vi-VN",
-    # Ближний Восток
-    "sa": "ar-SA", "ae": "ar-AE", "il": "en-IL", "qa": "ar-QA", "kw": "ar-KW",
-    "bh": "ar-BH", "om": "ar-OM", "jo": "ar-JO", "lb": "ar-LB",
-    # Африка
-    "ma": "fr-MA",
-    # Северная Америка
-    "ca": "en-CA",
-    # Южная Америка
-    "br": "pt-BR", "cl": "es-CL", "co": "es-CO", "pe": "es-PE", "ec": "es-EC",
-    "uy": "es-UY", "py": "es-PY", "bo": "es-BO", "ve": "es-VE",
-    "cr": "es-CR", "pa": "es-PA", "gt": "es-GT", "sv": "es-SV", "hn": "es-HN",
-    "ni": "es-NI", "do": "es-DO",
-    # Океания
-    "nz": "en-NZ",
+    # === PSPricing B2B API — все 70 регионов (region code → PS Store locale) ===
+    "ae": "ar-AE", "ar": "es-AR", "at": "de-AT", "au": "en-AU",
+    "be": "nl-BE", "bg": "bg-BG", "bh": "ar-BH", "bo": "es-BO", "br": "pt-BR", "ca": "en-CA",
+    "ch": "de-CH", "cl": "es-CL", "cn": "zh-CN", "co": "es-CO", "cr": "es-CR", "cy": "el-CY",
+    "cz": "cs-CZ", "de": "de-DE", "dk": "da-DK", "ec": "es-EC",
+    "es": "es-ES", "fi": "fi-FI", "fr": "fr-FR", "gb": "en-GB", "gr": "el-GR", "gt": "es-GT",
+    "hk": "zh-HK", "hn": "es-HN", "hr": "hr-HR", "hu": "hu-HU",
+    "id": "id-ID", "ie": "en-IE", "il": "en-IL", "in": "en-IN", "is": "en-IS", "it": "it-IT",
+    "jp": "ja-JP", "kr": "ko-KR", "kw": "ar-KW", "lb": "ar-LB",
+    "lu": "de-LU", "mt": "en-MT", "mx": "es-MX", "my": "en-MY", "ni": "es-NI", "nl": "nl-NL",
+    "no": "no-NO", "nz": "en-NZ", "om": "ar-OM", "pa": "es-PA",
+    "pe": "es-PE", "pl": "pl-PL", "pt": "pt-PT", "py": "es-PY", "qa": "ar-QA", "ro": "ro-RO",
+    "ru": "ru-RU", "sa": "ar-SA", "se": "sv-SE", "sg": "en-SG",
+    "si": "sl-SI", "sk": "sk-SK", "sv": "es-SV", "th": "th-TH", "tr": "tr-TR", "tw": "zh-TW",
+    "ua": "uk-UA", "us": "en-US", "uy": "es-UY", "za": "en-ZA",
 }
 
 
