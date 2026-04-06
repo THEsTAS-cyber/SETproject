@@ -72,7 +72,7 @@ async def create_game(
 @router.get("", response_model=list[GameOut])
 async def list_games(
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(500, ge=1, le=2000),
     category: str | None = Query(None, description="Filter by content_type (game, bundle, etc.)"),
     db: AsyncSession = Depends(get_db_session),
 ) -> JSONResponse:
