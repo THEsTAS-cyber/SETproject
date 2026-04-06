@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve environment variables into config and launch nanobot gateway.
-
-Simplified for ProjectSET — without MCP packages.
-Add MCP servers back when you install mcp-lms / mcp-obs.
-"""
+"""Resolve environment variables into config and launch nanobot gateway."""
 
 import json
 import os
@@ -30,13 +26,37 @@ def main():
     if gateway_port := os.environ.get("NANOBOT_GATEWAY_CONTAINER_PORT"):
         config["gateway"]["port"] = int(gateway_port)
 
-    # MCP servers — set venv Python if present
+    # Replace LMS MCP with games MCP
+    if "lms" in config.get("tools", {}).get("mcpServers", {}):
+        del config["tools"]["mcpServers"]["lms"]
+    if "obs" in config.get("tools", {}).get("mcpServers", {}):
+        del config["tools"]["mcpServers"]["obs"]
+    config["tools"]["mcpServers"]["games"] = {
+        "command": "/app/nanobot/.venv/bin/python",
+        "args": ["-m", "mcp_games"],
+        "env": {
+            "NANOBOT_LMS_BACKEND_URL": os.environ.get(
+                "NANOBOT_LMS_BACKEND_URL", "http://backend:8000"
+            )
+        }
+    }
+
+    # Set venv Python for all MCP servers
     venv_python = "/app/nanobot/.venv/bin/python"
     for server_name in config.get("tools", {}).get("mcpServers", {}):
         config["tools"]["mcpServers"][server_name]["command"] = venv_python
 
+    # Load skill prompt if exists
+    skill_prompt_path = workspace_path / "skill_prompt.md"
+    if skill_prompt_path.exists():
+        config["agents"]["defaults"]["skill"] = skill_prompt_path.read_text()
+
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
+
+    # Clear any existing cron jobs
+    jobs_path = workspace_path / "jobs.json"
+    jobs_path.write_text("[]")
 
     nanobot_bin = "/app/nanobot/.venv/bin/nanobot"
     os.execv(nanobot_bin, [nanobot_bin, "gateway", "--config", str(resolved_path), "--workspace", str(workspace_path)])

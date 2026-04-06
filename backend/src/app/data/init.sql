@@ -44,3 +44,4 @@ CREATE INDEX IF NOT EXISTS idx_games_name ON games(name);
 CREATE INDEX IF NOT EXISTS idx_price_entries_game_id ON price_entries(game_id);
 CREATE INDEX IF NOT EXISTS idx_price_entries_region ON price_entries(region);
 CREATE INDEX IF NOT EXISTS idx_price_entries_collected_at ON price_entries(collected_at);
+
