@@ -35,16 +35,16 @@ const RUB_RATES: Record<string, number> = {
 };
 
 const REGION_NAMES: Record<string, string> = {
-  ua: "🇺🇦 Украина",
-  us: "🇺🇸 США",
+  ua: "🇺 Украина",
+  us: "🇺 США",
   gb: "🇬 Великобритания",
-  de: "🇩🇪 Германия",
+  de: "🇩 Германия",
   fr: "🇫 Франция",
-  pl: "🇵🇱 Польша",
+  pl: "🇵 Польша",
   tr: "🇹 Турция",
   jp: "🇯🇵 Япония",
-  br: "🇧🇷 Бразилия",
-  au: "🇦🇺 Австралия",
+  br: "🇧 Бразилия",
+  au: "🇦 Австралия",
 };
 
 function convertToRub(price: number, currency: string): number {
@@ -66,6 +66,7 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "cheapest">("cheapest");
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/games")
@@ -83,7 +84,6 @@ export default function GamesPage() {
     );
     if (validPrices.length === 0) return null;
 
-    // Find the cheapest when converted to RUB
     let best: PriceEntry | null = null;
     let bestRub = Infinity;
 
@@ -154,6 +154,7 @@ export default function GamesPage() {
             const bestRub = bestEntry
               ? convertToRub(bestEntry.current_price!, bestEntry.currency)
               : null;
+            const isExpanded = expandedId === game.id;
 
             const allPrices = game.price_entries
               .filter((e) => e.current_price !== null && e.current_price !== undefined)
@@ -197,17 +198,18 @@ export default function GamesPage() {
                   </div>
                 )}
 
-                {allPrices.length > 0 && (
+                {allPrices.length > 1 && (
                   <div className="all-prices">
-                    <details>
-                      <summary>
-                        Все цены ({allPrices.length} регион
-                        {allPrices.length > 1 ? "а" : ""})
-                      </summary>
+                    <button
+                      className="toggle-btn"
+                      onClick={() => setExpandedId(isExpanded ? null : game.id)}
+                    >
+                      {isExpanded ? "▲" : "▼"} Все цены ({allPrices.length})
+                    </button>
+                    {isExpanded && (
                       <div className="prices-list">
                         {allPrices.map((entry) => {
-                          const isBest =
-                            bestEntry && entry.id === bestEntry.id;
+                          const isBest = bestEntry && entry.id === bestEntry.id;
                           return (
                             <div
                               key={entry.id}
@@ -226,7 +228,7 @@ export default function GamesPage() {
                           );
                         })}
                       </div>
-                    </details>
+                    )}
                   </div>
                 )}
 
@@ -391,17 +393,20 @@ export default function GamesPage() {
         .all-prices {
           margin: 0.5rem 1rem 1rem;
         }
-        .all-prices details {
-          font-size: 0.85rem;
-        }
-        .all-prices summary {
+        .toggle-btn {
+          width: 100%;
+          padding: 0.5rem;
+          background: #f0f0f0;
+          border: none;
+          border-radius: 8px;
           cursor: pointer;
-          color: #6c5ce7;
+          font-size: 0.85rem;
           font-weight: 600;
-          padding: 0.25rem 0;
+          color: #6c5ce7;
+          transition: background 0.2s;
         }
-        .all-prices summary:hover {
-          color: #5a4bd1;
+        .toggle-btn:hover {
+          background: #e0e0e0;
         }
         .prices-list {
           margin-top: 0.5rem;
