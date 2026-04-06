@@ -32,13 +32,27 @@ class Settings(BaseSettings):
         alias="PSPRICING_COLLECTION",
     )
     pspricing_regions: list[str] = Field(
-        default=["ua", "us", "gb", "de", "fr", "pl", "tr", "jp", "br", "au"],
+        default=[
+            # === PSPricing B2B API — все 70 поддерживаемых регионов ===
+            "ae", "ar", "at", "au", "be", "bg", "bh", "bo", "br", "ca",
+            "ch", "cl", "cn", "cr", "cy", "cz", "de", "dk", "ec",
+            "es", "fi", "fr", "gb", "gr", "gt", "hk", "hn", "hr", "hu",
+            "id", "ie", "il", "in", "it", "jp", "kr", "kw", "lb",
+            "lu", "mt", "mx", "my", "ni", "nl", "no", "nz", "om", "pa",
+            "pe", "pl", "pt", "py", "qa", "ro", "ru", "sa", "se", "sg",
+            "si", "sk", "sv", "th", "tr", "tw", "ua", "us", "uy", "za",
+        ],
         alias="PSPRICING_REGIONS",
     )
     pspricing_sync_interval_hours: int = Field(
         default=12,
         alias="PSPRICING_SYNC_INTERVAL_HOURS",
     )
+
+    # Auth
+    jwt_secret: str = Field(default="change-me-in-production", alias="JWT_SECRET")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    jwt_expire_hours: int = Field(default=720, alias="JWT_EXPIRE_HOURS")  # 30 days
 
     @property
     def database_url(self) -> str:

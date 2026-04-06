@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.db.base import Base
 from app.models.game import Game, PriceEntry  # noqa: F401 — register models
+from app.models.user import User, UserFavoriteGame  # noqa: F401
 from app.settings import settings
 
 engine = create_async_engine(

@@ -114,6 +114,7 @@ class PriceSyncService:
             game = Game(
                 ps_id=parsed.get("ps_id"),
                 sku=parsed.get("sku"),
+                sku_suffix=parsed.get("sku_suffix"),
                 title_id=parsed.get("title_id"),
                 concept_id=parsed.get("concept_id"),
                 name=parsed.get("name", ""),
@@ -124,7 +125,7 @@ class PriceSyncService:
                 audio_languages=parsed.get("audio_languages", []),
                 subtitle_languages=parsed.get("subtitle_languages", []),
                 release_date=parsed.get("release_date"),
-                store_url=None,  # Can be added later
+                store_url=None,
             )
             self.db.add(game)
             await self.db.flush()
