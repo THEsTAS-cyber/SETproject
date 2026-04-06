@@ -105,18 +105,18 @@ _REGION_STORE_MAP: dict[str, str] = {
 }
 
 
-def build_ps_store_url(region: str, title_id: str | None) -> str | None:
+def build_ps_store_url(region: str, concept_id: int | None) -> str | None:
     """Build a PS Store URL for a game in a given region."""
-    if not title_id:
+    if not concept_id:
         return None
     locale = _REGION_STORE_MAP.get(region, "en-US")
-    return f"{_PS_STORE_BASE}/{locale}/product/{title_id}"
+    return f"{_PS_STORE_BASE}/{locale}/concept/{concept_id}"
 
 
 def inject_store_urls(game_data: dict[str, Any]) -> dict[str, Any]:
-    """Inject store_url into each price_entry based on region + title_id."""
-    title_id = game_data.get("title_id")
+    """Inject store_url into each price_entry based on region + concept_id."""
+    concept_id = game_data.get("concept_id")
     if "price_entries" in game_data and isinstance(game_data["price_entries"], list):
         for entry in game_data["price_entries"]:
-            entry["store_url"] = build_ps_store_url(entry["region"], title_id)
+            entry["store_url"] = build_ps_store_url(entry["region"], concept_id)
     return game_data

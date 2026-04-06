@@ -40,6 +40,11 @@ class Settings(BaseSettings):
         alias="PSPRICING_SYNC_INTERVAL_HOURS",
     )
 
+    # Auth
+    jwt_secret: str = Field(default="change-me-in-production", alias="JWT_SECRET")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    jwt_expire_hours: int = Field(default=720, alias="JWT_EXPIRE_HOURS")  # 30 days
+
     @property
     def database_url(self) -> str:
         return (

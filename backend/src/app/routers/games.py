@@ -73,18 +73,43 @@ async def create_game(
 async def list_games(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
+    category: str | None = Query(None, description="Filter by content_type (game, bundle, etc.)"),
     db: AsyncSession = Depends(get_db_session),
 ) -> JSONResponse:
-    """List all games with their price entries."""
-    stmt = (
-        select(Game)
-        .options(selectinload(Game.price_entries))
-        .order_by(Game.created_at.desc())
-        .offset(skip)
-        .limit(limit)
-    )
+    """List all games with their price entries, optionally filtered by category."""
+    stmt = select(Game).options(selectinload(Game.price_entries))
+    if category:
+        stmt = stmt.where(Game.content_type == category)
+    stmt = stmt.order_by(Game.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return _games_response(list(result.scalars().all()))
+
+
+@router.get("/categories")
+async def get_categories(
+    db: AsyncSession = Depends(get_db_session),
+) -> JSONResponse:
+    """Get available game categories with counts."""
+    stmt = select(Game.content_type, Game.top_category).distinct()
+    result = await db.execute(stmt)
+    rows = result.all()
+
+    categories = {}
+    for content_type, top_category in rows:
+        key = content_type or "unknown"
+        if key not in categories:
+            categories[key] = {"content_type": content_type, "top_categories": set()}
+        if top_category:
+            categories[key]["top_categories"].add(top_category)
+
+    data = [
+        {
+            "content_type": v["content_type"],
+            "top_categories": sorted(v["top_categories"]),
+        }
+        for v in categories.values()
+    ]
+    return JSONResponse(content=data)
 
 
 # ── Specific paths MUST come before /{game_id} to avoid routing conflicts ──
@@ -132,6 +157,7 @@ async def compare_games_by_title(
             "game_id": game.id,
             "name": game.name,
             "title_id": game.title_id,
+            "concept_id": game.concept_id,
             "sku_suffix": game.sku_suffix,
             "cover_url": game.cover_url,
             "price_entries": [
@@ -151,7 +177,7 @@ async def compare_games_by_title(
         }
         # Rename price_entries to prices for comparison endpoint
         gd["prices"] = gd.pop("price_entries")
-        inject_store_urls({"title_id": gd["title_id"], "price_entries": gd["prices"]})
+        inject_store_urls({"concept_id": gd["concept_id"], "price_entries": gd["prices"]})
         data.append(gd)
     return JSONResponse(content=data)
 

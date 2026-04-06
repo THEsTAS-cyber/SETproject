@@ -55,8 +55,10 @@ def create_app() -> FastAPI:
         return {"status": "ok", "service": settings.name}
 
     # Include routers
-    from app.routers import admin, games
+    from app.routers import admin, auth, favorites, games
+    app.include_router(auth.router)
     app.include_router(games.router)
+    app.include_router(favorites.router)
     app.include_router(admin.router)
 
     return app
