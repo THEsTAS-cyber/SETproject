@@ -104,3 +104,130 @@ body {
   .auth-link { font-size: .8rem; padding: .3rem .6rem; }
   .auth-user { display: none; }
 }
+
+/* ── Nanobot Widget ── */
+.nanobot-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(108,92,231,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s, box-shadow .2s;
+  z-index: 1000;
+}
+.nanobot-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(108,92,231,.5); }
+
+.nanobot-window {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 380px;
+  max-width: calc(100vw - 2rem);
+  height: 500px;
+  max-height: calc(100vh - 4rem);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.nanobot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .75rem 1rem;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+  color: #fff;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: .5rem;
+}
+.status-dot.online { background: #4caf50; }
+.status-dot.offline { background: #f44336; }
+
+.nanobot-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.7);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.nanobot-close:hover { color: #fff; }
+
+.nanobot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.nanobot-messages .msg {
+  max-width: 85%;
+  padding: .6rem .9rem;
+  border-radius: 12px;
+  font-size: .85rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.nanobot-messages .msg.user {
+  align-self: flex-end;
+  background: #6c5ce7;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.nanobot-messages .msg.assistant {
+  align-self: flex-start;
+  background: #f0f0f0;
+  color: #1a1a2e;
+  border-bottom-left-radius: 4px;
+}
+
+.nanobot-input {
+  display: flex;
+  gap: .5rem;
+  padding: .75rem;
+  border-top: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+.nanobot-input input {
+  flex: 1;
+  padding: .5rem .75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: .85rem;
+  outline: none;
+}
+.nanobot-input input:focus { border-color: #6c5ce7; }
+.nanobot-input button {
+  padding: .5rem 1rem;
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nanobot-input button:disabled { opacity: .5; cursor: not-allowed; }

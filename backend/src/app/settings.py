@@ -35,7 +35,7 @@ class Settings(BaseSettings):
         default=[
             # === PSPricing B2B API — все 70 поддерживаемых регионов ===
             "ae", "ar", "at", "au", "be", "bg", "bh", "bo", "br", "ca",
-            "ch", "cl", "cn", "co", "cr", "cy", "cz", "de", "dk", "ec",
+            "ch", "cl", "cn", "cr", "cy", "cz", "de", "dk", "ec",
             "es", "fi", "fr", "gb", "gr", "gt", "hk", "hn", "hr", "hu",
             "id", "ie", "il", "in", "is", "it", "jp", "kr", "kw", "lb",
             "lu", "mt", "mx", "my", "ni", "nl", "no", "nz", "om", "pa",
