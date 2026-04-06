@@ -151,7 +151,7 @@ async def compare_games_by_title(
         }
         # Rename price_entries to prices for comparison endpoint
         gd["prices"] = gd.pop("price_entries")
-        inject_store_urls({"title_id": gd["title_id"], "sku_suffix": gd["sku_suffix"], "price_entries": gd["prices"]})
+        inject_store_urls({"title_id": gd["title_id"], "price_entries": gd["prices"]})
         data.append(gd)
     return JSONResponse(content=data)
 
