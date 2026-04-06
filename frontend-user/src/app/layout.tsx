@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "./AuthProvider";
+import AuthNav from "./AuthNav";
 import NanobotWidget from "@/components/NanobotWidget";
 
 export const metadata: Metadata = {
@@ -15,14 +17,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="header">
-          <nav>
-            <a href="/">Home</a>
-            <a href="/games">Games</a>
-          </nav>
-        </header>
-        <main>{children}</main>
-        <NanobotWidget />
+        <AuthProvider>
+          <header className="header">
+            <nav>
+              <a href="/">Home</a>
+              <a href="/games">Games</a>
+              <a href="/favorites">Избранное</a>
+              <AuthNav />
+            </nav>
+          </header>
+          <main>{children}</main>
+          <NanobotWidget />
+        </AuthProvider>
       </body>
     </html>
   );
