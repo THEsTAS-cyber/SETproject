@@ -1,171 +1,155 @@
-# ProjectSET — Шаблон проекта
+# ProjectSET — PS Store Price Comparator
 
-Продакшн-шаблон Python-проекта с PostgreSQL, Docker, FastAPI-бэкендом и двумя Next.js-фронтендами.
+**Сравнение цен игр PlayStation Store по 67 регионам мира** — находите самые выгодные предложения и покупайте игры дешевле.
 
-## Структура проекта
+## Demo
 
-```
-ProjectSET/
-├── backend/                    # FastAPI-приложение
-│   ├── src/app/
-│   │   ├── main.py             # Точка входа (FastAPI app factory)
-│   │   ├── run.py              # Запуск uvicorn
-│   │   ├── settings.py         # Pydantic-settings конфигурация
-│   │   ├── database.py         # Async SQLAlchemy engine + сессии
-│   │   ├── models/             # SQLAlchemy модели
-│   │   ├── routers/            # API роутеры
-│   │   ├── db/                 # Миграции
-│   │   └── data/init.sql       # Init-скрипт для PostgreSQL
-│   ├── tests/                  # Unit + E2E тесты
-│   ├── Dockerfile              # 2-этапная сборка (uv → slim)
-│   └── pyproject.toml          # Зависимости backend
-├── frontend-user/              # Next.js — пользовательская панель
-│   ├── src/app/
-│   │   ├── layout.tsx          # Корневой лейаут с навигацией
-│   │   ├── page.tsx            # Главная страница
-│   │   └── globals.css         # Стили
-│   ├── next.config.ts          # Next.js конфиг (standalone + rewrites)
-│   ├── Dockerfile              # 2-этапная сборка (node)
-│   └── package.json
-├── frontend-admin/             # Next.js — админ-панель
-│   ├── src/app/
-│   │   ├── layout.tsx          # Корневой лейаут с админ-навигацией
-│   │   ├── page.tsx            # Дашборд админа
-│   │   └── globals.css         # Стили
-│   ├── next.config.ts          # Next.js конфиг (standalone + rewrites)
-│   ├── Dockerfile              # 2-этапная сборка (node)
-│   └── package.json
-├── caddy/
-│   └── Caddyfile               # Reverse proxy (маршрутизация)
-├── nanobot/                    # AI-агент (nanobot-ai)
-│   ├── config.json             # Конфигурация агента (в .gitignore!)
-│   ├── config.template.json    # Шаблон конфигурации
-│   ├── entrypoint.py           # Резолв env → config + запуск
-│   ├── Dockerfile              # Сборка nanobot
-│   └── workspace/              # Рабочее пространство агента
-├── qwen-code-api/              # Прокси к LLM (git submodule)
-├── docker-compose.yml          # Оркестрация всех сервисов
-├── .env.docker.example         # Шаблон переменных окружения
-├── pyproject.toml              # Корневой — uv workspace, dev-зависимости
-├── .gitignore
-└── README.md / REPORT.md       # Документация
-```
+> *Скриншоты будут добавлены после деплоя:*
+> 1. Главная страница — каталог игр PS4/PS5 с ценами
+> 2. Карточка игры — сравнение цен по всем регионам
+> 3. Страница избранного
 
-## Сервисы (docker-compose.yml)
+## Product Context
 
-| Сервис | Описание | Порт |
-|--------|----------|------|
-| **backend** | FastAPI + SQLAlchemy | 42001 |
-| **postgres** | PostgreSQL 18 | 42004 |
-| **pgadmin** | Веб-админка БД | 42003 |
-| **frontend-user** | Next.js (user panel) | — |
-| **frontend-admin** | Next.js (admin panel) | — |
-| **nanobot** | AI-агент (nanobot-ai + webchat) | 42006 |
-| **qwen-code-api** | Прокси к LLM | 42005 |
-| **caddy** | Reverse proxy | 42002 |
+### End Users
 
-## Маршрутизация (Caddyfile)
+- **Геймеры из России и стран СНГ**, которые используют зарубежные аккаунты PlayStation (Турция, Аргентина, Польша и др.) из-за ограничений российского PS Store.
+- **Покупатели**, ищущие регион с самой низкой ценой на конкретную игру.
+- **Экономные геймеры**, отслеживающие скидки и распродажи.
 
-| Путь | Куда |
-|------|------|
-| `/admin*` | frontend-admin:3001 |
-| `/` (остальное) | frontend-user:3000 |
-| `/docs*`, `/openapi.json` | backend:8000 |
-| `/utils/pgadmin*` | pgadmin:80 |
+### Problem
 
-API-запросы (`/api/*`) проксируются через Next.js rewrites — каждый фронтенд сам роутит их на backend.
+После приостановки работы PS Store в России пользователи вынуждены заводить аккаунты в других странах. Но найти, где игра стоит дешевле — сложно: нужно заходить в каждый регион по отдельности, конвертировать валюты вручную, отслеживать скидки. Сравнение цен становится утомительным и отнимает много времени.
 
-## Развёртывание
+### Our Solution
 
-### Предварительные требования
+Единый каталог, который **автоматически собирает цены** из 67 регионов PS Store каждые 12 часов, конвертирует их в рубли и показывает **самую выгодную покупку** для каждой игры. Пользователь видит: в какой стране игра дешевле всего, и может перейти прямо на страницу покупки в PS Store нужного региона.
 
-- **Docker** и **Docker Compose** установлены
-- **Python 3.12+** (для локальной разработки)
-- **uv** — менеджер зависимостей (`pip install uv`)
-- **Qwen Code CLI** авторизован на хост-машине
+> **Важно:** Парсятся **только игры для PlayStation (PS4/PS5)**. Игры из Epic Games Store, Steam и других платформ не отображаются.
 
-### Шаг 1 — Авторизация Qwen Code
+## Features
 
-Nanobot использует `qwen-code-api` как прокси к LLM. Для этого нужна авторизация:
+### Implemented (Version 1)
 
-```bash
-# Установи Qwen Code CLI (если ещё не установлен)
-pip install qwen-code
+| Feature | Description |
+|---------|-------------|
+| **Парсинг цен из 67 регионов PS Store** | Автоматический сбор данных каждые 12 часов через PSPricing API |
+| **Фильтр: только PlayStation** | Показываются только PS4/PS5 игры, без Epic/Steam |
+| **Каталог с обложками и платформами** | Бейджи PS5/PS4, обложки, скидки |
+| **Пересчёт цен в рубли** | Актуальные курсы для 40+ валют |
+| **Подсветка лучшей цены** | Зелёным выделяется регион с минимальной ценой в рублях |
+| **Все цены по регионам** | Раскрывающийся список с 67 ценами |
+| **Прямые ссылки на PS Store** | Кнопка «🛒 PS Store» ведёт на страницу покупки в нужном регионе |
+| **Поиск по названию** | Мгновенный поиск по каталогу |
+| **Фильтр по платформе** | Все / PS5 / PS4 |
+| **Фильтр по типу** | Все / Игры / Наборы / DLC |
+| **Сортировка** | По выгодной цене / По названию / По скидке |
+| **Регистрация и авторизация** | JWT-токены, пароль хешируется bcrypt |
+| **Избранное (wishlist)** | Сохранение игр в личном профиле |
+| **AI-ассистент (nanobot)** | Чат-бот в углу экрана для вопросов об играх |
+| **Адаптивный дизайн** | Мобильная версия, чат на полный экран |
 
-# Войди в аккаунт — создаст ~/.qwen/oauth_creds.json
-qwen login
-```
+### Not Yet Implemented (Version 2)
 
-> **Без этого шага** `qwen-code-api` не сможет обращаться к LLM, и nanobot не ответит.
+| Feature | Priority |
+|---------|----------|
+| История изменения цен (график) | Medium |
+| Уведомления о снижении цены на избранное | High |
+| Экспорт списка цен в CSV | Low |
+| Сравнение двух игр бок о бок | Medium |
+| Отображение DLC и дополнений | Low |
 
-### Шаг 2 — Конфигурация окружения
+## Usage
+
+### Основной сценарий
+
+1. **Откройте сайт** — `http://<IP-вашей-VM>:42002`
+2. **Найдите игру** через поиск или пролистайте каталог.
+3. **Посмотрите лучшую цену** — она подсвечена зелёным в карточке.
+4. **Раскройте «Все цены»** — увидите полный список по всем 67 регионам с пересчётом в рубли.
+5. **Нажмите «🛒 PS Store»** — перейдёте на страницу покупки в нужном регионе.
+6. **Добавьте в избранное** ❤️ — игра сохранится в вашем профиле.
+
+### AI-ассистент
+
+Нажмите на кнопку 💬 в правом нижнем углу и спросите, например:
+- *«Покажи дешёвые игры»*
+- *«Найди Elden Ring»*
+- *«Какие есть RPG?»*
+
+## Deployment
+
+### System Requirements
+
+- **OS:** Ubuntu 24.04 LTS
+- **RAM:** 4 GB minimum (8 GB recommended)
+- **Disk:** 20 GB free space
+- **Software:** Docker 26+, Docker Compose v2
+
+### Step-by-Step Instructions
 
 ```bash
-# Скопируй шаблон
-cp .env.docker.example .env.docker.secret
+# 1. Clone the repository
+git clone https://github.com/your-org/ProjectSET.git
+cd ProjectSET
 
-# Отредактируй .env.docker.secret:
-#   LLM_API_KEY=demo-key          # любой ключ для nanobot
-#   LMS_API_KEY=change-me         # ключ для MCP-тулзов (если добавишь)
-#   QWEN_CODE_API_KEY=            # оставь пустым (используется ~/.qwen)
+# 2. Create environment file
+cp .env.docker.example .env
+# Отредактируйте .env при необходимости (пароль БД, JWT secret и т.д.)
+
+# 3. Запустите все сервисы
+docker compose up -d --build
+
+# 4. Дождитесь готовности (~30 секунд)
+docker compose ps
+
+# 5. Проверьте работоспособность бэкенда
+curl http://localhost:42001/health
+
+# 6. Убедитесь, что синхронизация цен запущена
+docker compose logs backend --tail=30
 ```
 
-### Шаг 3 — Запуск
+### Services & Ports
+
+| Service | Port | Description |
+|---------|------|-------------|
+| **Caddy (gateway)** | `42002` | Точка входа, обратный прокси |
+| **Backend API** | `42001` | FastAPI + PostgreSQL |
+| **pgAdmin** | `42003` | Панель управления БД |
+| **Nanobot (AI)** | `42006` | WebSocket чат-ассистент |
+| **Qwen Code API** | `42005` | Прокси к LLM |
+
+### Access Points
+
+- **Фронтенд:** `http://<VM_IP>:42002`
+- **pgAdmin:** `http://<VM_IP>:42003` (login: `admin@example.com` / `admin`)
+- **Backend API:** `http://<VM_IP>:42001`
+
+### Stopping
 
 ```bash
-docker compose up --build
+docker compose down
+# Чтобы удалить данные БД:
+docker compose down -v
 ```
 
-Первый запуск займёт 2-5 минут (сборка образов, загрузка postgres, node, nanobot-ai).
-
-### Шаг 4 — Проверка
-
-| Сервис | URL |
-|--------|-----|
-| User panel | http://localhost:42002 |
-| Admin panel | http://localhost:42002/admin |
-| Swagger docs | http://localhost:42002/docs |
-| pgAdmin | http://localhost:42002/utils/pgadmin |
-| Nanobot (WebSocket) | ws://localhost:42002/ws/chat |
-
-## Быстрый старт (для опытных)
+### Updating
 
 ```bash
-qwen login
-cp .env.docker.example .env.docker.secret
-docker compose up --build
+git pull
+docker compose up -d --build
 ```
 
-Открой http://localhost:42002 — готово.
+## Tech Stack
 
-## Что где
-
-- **`backend/src/app/`** — бизнес-логика. Роутеры в `routers/`, модели в `models/`, БД в `db/`
-- **`frontend-user/`** и **`frontend-admin/`** — два независимых Next.js приложения
-- **`nanobot/`** — AI-агент: `config.json` (секреты, не коммитить!), `entrypoint.py` (резолв env), `workspace/`
-- **`qwen-code-api/`** — прокси к LLM (git submodule), монтирует `~/.qwen` для авторизации
-- **`docker-compose.yml`** — 8 сервисов в одной сети `app-network`
-- **`caddy/Caddyfile`** — маршрутизация: `/admin*` → admin, `/ws/chat` → nanobot, остальное → user
-- **`pyproject.toml` (корневой)** — uv workspace + dev tools (ruff, pyright, pytest, poethepoet)
-- **`backend/Dockerfile`** — двухэтапная сборка: uv sync → slim образ с nonroot-юзером
-- **`frontend-*/Dockerfile`** — двухэтапная сборка: node builder → node runner (standalone)
-- **`.env.docker.secret`** — ВСЕ секреты здесь, НИКОГДА не коммитить
-
-## Команды
-
-```bash
-# Запустить всё
-docker compose up --build
-
-# Только backend
-docker compose up backend postgres
-
-# Запустить backend локально (для разработки)
-cd backend && python -m app.run
-
-# Тесты
-poe test
-
-# Линтинг + форматирование
-poe check
-```
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Python 3.14, FastAPI, SQLAlchemy (async) |
+| **Database** | PostgreSQL 17 |
+| **Frontend** | Next.js 15, React 19, TypeScript |
+| **AI Agent** | Nanobot (WebSocket MCP) |
+| **Gateway** | Caddy 2 |
+| **Orchestration** | Docker Compose |
+| **Package Manager** | uv |
+| **Data Source** | PSPricing B2B API (67 регионов) |
