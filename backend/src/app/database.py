@@ -5,7 +5,7 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.db.base import Base
-from app.models.game import Game  # noqa: F401 — register model
+from app.models.game import Game, PriceEntry  # noqa: F401 — register models
 from app.settings import settings
 
 engine = create_async_engine(
@@ -30,3 +30,15 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         except Exception:
             await session.rollback()
             raise
+
+
+async def init_db():
+    """Create all tables (for development/initial setup)."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def drop_db():
+    """Drop all tables (for development/testing)."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)

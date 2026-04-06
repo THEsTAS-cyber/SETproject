@@ -22,6 +22,24 @@ class Settings(BaseSettings):
     db_user: str = Field(default="postgres", alias="DB_USER")
     db_password: str = Field(default="postgres", alias="DB_PASSWORD")
 
+    # PSPricing API
+    pspricing_base_url: str = Field(
+        default="https://psprices.com/api/b2b/demo/",
+        alias="PSPRICING_BASE_URL",
+    )
+    pspricing_collection: str = Field(
+        default="most-wanted-deals",
+        alias="PSPRICING_COLLECTION",
+    )
+    pspricing_regions: list[str] = Field(
+        default=["ua", "us", "gb", "de", "fr", "pl", "tr", "jp", "br", "au"],
+        alias="PSPRICING_REGIONS",
+    )
+    pspricing_sync_interval_hours: int = Field(
+        default=12,
+        alias="PSPRICING_SYNC_INTERVAL_HOURS",
+    )
+
     @property
     def database_url(self) -> str:
         return (
