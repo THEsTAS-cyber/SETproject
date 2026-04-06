@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
-from sqlalchemy import or_, select
+from sqlalchemy import or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -79,8 +79,8 @@ async def list_games(
     """List all games with their price entries."""
     stmt = select(Game).options(selectinload(Game.price_entries))
     if ps_only:
-        # Filter: platforms array overlaps with ['PS5', 'PS4']
-        stmt = stmt.where(Game.platforms.op("&&")(["PS5", "PS4"]))
+        # Filter: platforms array overlaps with ['PS5', 'PS4'] (explicit text[] cast)
+        stmt = stmt.where(Game.platforms.overlap(["PS5", "PS4"]))
     stmt = stmt.order_by(Game.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return _games_response(list(result.scalars().all()))
