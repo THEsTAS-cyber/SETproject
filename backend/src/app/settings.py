@@ -37,7 +37,7 @@ class Settings(BaseSettings):
             "ae", "ar", "at", "au", "be", "bg", "bh", "bo", "br", "ca",
             "ch", "cl", "cn", "cr", "cy", "cz", "de", "dk", "ec",
             "es", "fi", "fr", "gb", "gr", "gt", "hk", "hn", "hr", "hu",
-            "id", "ie", "il", "in", "is", "it", "jp", "kr", "kw", "lb",
+            "id", "ie", "il", "in", "it", "jp", "kr", "kw", "lb",
             "lu", "mt", "mx", "my", "ni", "nl", "no", "nz", "om", "pa",
             "pe", "pl", "pt", "py", "qa", "ro", "ru", "sa", "se", "sg",
             "si", "sk", "sv", "th", "tr", "tw", "ua", "us", "uy", "za",

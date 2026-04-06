@@ -107,127 +107,117 @@ body {
 
 /* ── Nanobot Widget ── */
 .nanobot-toggle {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #6c5ce7;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(108,92,231,.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform .2s, box-shadow .2s;
-  z-index: 1000;
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #6c5ce7; color: #fff; border: none;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(108,92,231,.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .2s; z-index: 1000;
 }
 .nanobot-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(108,92,231,.5); }
 
 .nanobot-window {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  width: 380px;
-  max-width: calc(100vw - 2rem);
-  height: 500px;
-  max-height: calc(100vh - 4rem);
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0,0,0,.15);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 1000;
+  position: fixed; bottom: 1rem; right: 1rem;
+  width: 400px; max-width: calc(100vw - 2rem);
+  height: 560px; max-height: calc(100vh - 6rem);
+  background: #fff; border-radius: 20px;
+  box-shadow: 0 12px 48px rgba(0,0,0,.2);
+  display: flex; flex-direction: column; overflow: hidden; z-index: 1000;
 }
 
 .nanobot-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: .75rem 1rem;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .85rem 1rem;
   background: linear-gradient(135deg, #1a1a2e, #2d2d44);
-  color: #fff;
-  font-weight: 600;
-  font-size: .9rem;
+  color: #fff; font-weight: 700; font-size: .95rem; flex-shrink: 0;
 }
 
 .status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-left: .5rem;
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-left: .5rem;
 }
-.status-dot.online { background: #4caf50; }
+.status-dot.online { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
 .status-dot.offline { background: #f44336; }
 
 .nanobot-close {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,.7);
-  font-size: 1.5rem;
-  cursor: pointer;
-  line-height: 1;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.3rem; cursor: pointer;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
 }
-.nanobot-close:hover { color: #fff; }
+.nanobot-close:hover { background: rgba(255,255,255,.25); }
 
 .nanobot-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
+  flex: 1; overflow-y: auto; padding: 1rem;
+  display: flex; flex-direction: column; gap: .75rem;
+  background: #f8f9fb;
 }
 
 .nanobot-messages .msg {
-  max-width: 85%;
-  padding: .6rem .9rem;
-  border-radius: 12px;
-  font-size: .85rem;
-  line-height: 1.4;
-  word-break: break-word;
+  max-width: 88%; padding: .7rem 1rem;
+  border-radius: 16px; font-size: .88rem; line-height: 1.55;
+  word-break: break-word; animation: msgIn .25s ease;
 }
+@keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
 .nanobot-messages .msg.user {
-  align-self: flex-end;
-  background: #6c5ce7;
-  color: #fff;
+  align-self: flex-end; background: #6c5ce7; color: #fff;
   border-bottom-right-radius: 4px;
 }
 .nanobot-messages .msg.assistant {
-  align-self: flex-start;
-  background: #f0f0f0;
-  color: #1a1a2e;
-  border-bottom-left-radius: 4px;
+  align-self: flex-start; background: #fff; color: #1a1a2e;
+  border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
+.nanobot-messages .msg.assistant h1,
+.nanobot-messages .msg.assistant h2,
+.nanobot-messages .msg.assistant h3 {
+  margin: .5rem 0 .25rem; font-size: .95rem;
+}
+.nanobot-messages .msg.assistant code {
+  background: #f0f0f0; padding: 1px 5px; border-radius: 4px;
+  font-size: .82rem;
+}
+.nanobot-messages .msg.assistant strong { font-weight: 700; }
+
+/* Typing indicator */
+.msg.typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: .85rem 1.1rem !important; min-width: 60px;
+}
+.typing-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #999; animation: typingBounce .6s ease infinite alternate;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes typingBounce { from { opacity:.3; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
 
 .nanobot-input {
-  display: flex;
-  gap: .5rem;
-  padding: .75rem;
-  border-top: 1px solid #e0e0e0;
-  background: #fafafa;
+  display: flex; gap: .5rem; padding: .75rem;
+  border-top: 1px solid #e8e8e8; background: #fff; flex-shrink: 0;
 }
 .nanobot-input input {
-  flex: 1;
-  padding: .5rem .75rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: .85rem;
-  outline: none;
+  flex: 1; padding: .6rem .85rem;
+  border: 2px solid #e8e8e8; border-radius: 24px;
+  font-size: .88rem; outline: none; transition: border-color .2s;
 }
 .nanobot-input input:focus { border-color: #6c5ce7; }
 .nanobot-input button {
-  padding: .5rem 1rem;
-  background: #6c5ce7;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: .85rem;
-  font-weight: 600;
-  cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #6c5ce7; color: #fff; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s, transform .15s; flex-shrink: 0;
 }
-.nanobot-input button:disabled { opacity: .5; cursor: not-allowed; }
+.nanobot-input button:hover:not(:disabled) { background: #5a4bd1; transform: scale(1.05); }
+.nanobot-input button:disabled { opacity: .4; cursor: not-allowed; }
+
+@media (max-width: 480px) {
+  .nanobot-window {
+    bottom: 0; right: 0; left: 0;
+    width: 100%; max-width: 100%;
+    height: 100vh; max-height: 100vh;
+    border-radius: 0;
+  }
+  .nanobot-toggle { bottom: 1rem; right: 1rem; width: 52px; height: 52px; }
+}
