@@ -32,7 +32,31 @@ class Settings(BaseSettings):
         alias="PSPRICING_COLLECTION",
     )
     pspricing_regions: list[str] = Field(
-        default=["ua", "us", "gb", "de", "fr", "pl", "tr", "jp", "br", "au"],
+        default=[
+            # === Основные рынки ===
+            "us", "gb", "de", "fr", "jp", "au",  # уже были
+            # === Восточная Европа / СНГ ===
+            "ua", "pl", "ru", "kz", "by",  # уже были ua, pl
+            # === Дешёвые регионы (лучшие цены) ===
+            "tr", "ar", "th", "in", "eg", "ng", "za", "id", "ph", "mx",
+            # === Европа ===
+            "es", "it", "nl", "be", "at", "ch", "se", "no", "dk", "fi",
+            "pt", "ie", "cz", "hu", "ro", "bg", "hr", "sk", "si", "lt",
+            "lv", "ee", "lu", "mt", "cy", "is", "gr",
+            # === Азия ===
+            "hk", "kr", "tw", "sg", "my", "vn",
+            # === Ближний Восток ===
+            "sa", "ae", "il", "qa", "kw", "bh", "om", "jo", "lb",
+            # === Африка ===
+            "ma", "eg",
+            # === Северная Америка ===
+            "ca", "mx",
+            # === Южная Америка ===
+            "br", "cl", "co", "pe", "ec", "uy", "py", "bo", "ve",
+            "cr", "pa", "gt", "sv", "hn", "ni", "do",
+            # === Океания ===
+            "nz",
+        ],
         alias="PSPRICING_REGIONS",
     )
     pspricing_sync_interval_hours: int = Field(

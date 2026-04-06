@@ -21,16 +21,15 @@
         reverse_proxy http://nanobot:8765
     }
 
+    # Backend API — /api/* → backend
+    handle /api* {
+        reverse_proxy http://backend:{$BACKEND_CONTAINER_PORT}
+    }
+
     # User panel — everything else → frontend-user
     handle {
         reverse_proxy http://frontend-user:3000
     }
-
-    # Backend API — проксируется через Next.js rewrites (frontend сам роутит /api)
-    # Если нужен прямой доступ:
-    # handle /api* {
-    #     reverse_proxy http://backend:{$BACKEND_CONTAINER_PORT}
-    # }
 
     handle /utils/pgadmin* {
         reverse_proxy http://pgadmin:{$CONST_PGADMIN_CONTAINER_PORT}

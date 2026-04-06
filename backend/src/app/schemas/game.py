@@ -84,24 +84,36 @@ _PS_STORE_BASE = "https://store.playstation.com"
 
 # Region code → PS Store locale prefix
 _REGION_STORE_MAP: dict[str, str] = {
-    "ua": "uk-UA",
-    "us": "en-US",
-    "gb": "en-GB",
-    "de": "de-DE",
-    "fr": "fr-FR",
-    "pl": "pl-PL",
-    "tr": "tr-TR",
-    "jp": "ja-JP",
-    "br": "pt-BR",
-    "au": "en-AU",
-    "ru": "ru-RU",
+    # Основные
+    "us": "en-US", "gb": "en-GB", "de": "de-DE", "fr": "fr-FR", "jp": "ja-JP", "au": "en-AU",
+    # Восточная Европа
+    "ua": "uk-UA", "pl": "pl-PL", "ru": "ru-RU", "kz": "ru-KZ", "by": "ru-BY",
+    # Дешёвые
+    "tr": "tr-TR", "ar": "es-AR", "th": "th-TH", "in": "en-IN", "eg": "ar-EG",
+    "ng": "en-NG", "za": "en-ZA", "id": "id-ID", "ph": "en-PH", "mx": "es-MX",
+    # Европа
+    "es": "es-ES", "it": "it-IT", "nl": "nl-NL", "be": "nl-BE", "at": "de-AT",
+    "ch": "de-CH", "se": "sv-SE", "no": "no-NO", "dk": "da-DK", "fi": "fi-FI",
+    "pt": "pt-PT", "ie": "en-IE", "cz": "cs-CZ", "hu": "hu-HU", "ro": "ro-RO",
+    "bg": "bg-BG", "hr": "hr-HR", "sk": "sk-SK", "si": "sl-SI", "lt": "lt-LT",
+    "lv": "lv-LV", "ee": "et-EE", "lu": "de-LU", "mt": "en-MT", "cy": "el-CY",
+    "is": "en-IS", "gr": "el-GR",
+    # Азия
+    "hk": "zh-HK", "kr": "ko-KR", "tw": "zh-TW", "sg": "en-SG", "my": "en-MY", "vn": "vi-VN",
+    # Ближний Восток
+    "sa": "ar-SA", "ae": "ar-AE", "il": "en-IL", "qa": "ar-QA", "kw": "ar-KW",
+    "bh": "ar-BH", "om": "ar-OM", "jo": "ar-JO", "lb": "ar-LB",
+    # Африка
+    "ma": "fr-MA",
+    # Северная Америка
     "ca": "en-CA",
-    "mx": "es-MX",
-    "ar": "es-AR",
-    "kr": "ko-KR",
-    "hk": "zh-HK",
-    "tw": "zh-TW",
-    "in": "en-IN",
+    # Южная Америка
+    "br": "pt-BR", "cl": "es-CL", "co": "es-CO", "pe": "es-PE", "ec": "es-EC",
+    "uy": "es-UY", "py": "es-PY", "bo": "es-BO", "ve": "es-VE",
+    "cr": "es-CR", "pa": "es-PA", "gt": "es-GT", "sv": "es-SV", "hn": "es-HN",
+    "ni": "es-NI", "do": "es-DO",
+    # Океания
+    "nz": "en-NZ",
 }
 
 

@@ -16,12 +16,33 @@ interface Game {
 
 const RUB_RATES: Record<string, number> = {
   RUB: 1, USD: 92, EUR: 100, UAH: 2.2, GBP: 118, PLN: 23,
-  TRY: 2.5, JPY: 0.6, BRL: 16, AUD: 60,
+  TRY: 2.5, JPY: 0.6, BRL: 16, AUD: 60, ARS: 0.08, THB: 2.7,
+  INR: 1.1, EGP: 1.9, NGN: 0.06, ZAR: 5.0, IDR: 0.006,
+  PHP: 1.6, MXN: 4.5, KRW: 0.07, HKD: 12, TWD: 2.9,
+  SGD: 69, MYR: 20, VND: 0.004, SAR: 24.5, AED: 25,
+  ILS: 25, QAR: 25.3, KWD: 300, BHD: 244, OMR: 239,
+  JOD: 130, LBP: 0.01, MAD: 9.2, KZT: 0.2, BYN: 28,
+  CLP: 0.095, COP: 0.023, PEN: 24.5, UYU: 2.3, PYG: 0.012,
+  BOB: 13.3, VES: 2.5, CRC: 0.18, GTQ: 12, SVC: 10.5,
+  HNL: 3.7, NIO: 2.5, DOP: 1.55, PAB: 92, CAD: 68,
+  NZD: 55, CZK: 4.1, HUF: 0.26, RON: 20.2, BGN: 51,
+  HRK: 13.3, SKK: 3.3, ISK: 0.67, DKK: 13.4, SEK: 8.8,
+  NOK: 8.6, CHF: 104,
 };
 const REGION_NAMES: Record<string, string> = {
-  ua: "🇺🇦 Украина", us: "🇺 США", gb: "🇬 Великобритания",
-  de: "🇩 Германия", fr: "🇫 Франция", pl: "🇵🇱 Польша",
+  ua: "🇺🇦 Украина", us: "🇺🇸 США", gb: "🇬🇧 Великобритания",
+  de: "🇩🇪 Германия", fr: "🇫🇷 Франция", pl: "🇵🇱 Польша",
   tr: "🇹🇷 Турция", jp: "🇯🇵 Япония", br: "🇧🇷 Бразилия", au: "🇦🇺 Австралия",
+  ar: "🇦🇷 Аргентина", th: "🇹🇭 Таиланд", in: "🇮🇳 Индия",
+  eg: "🇪🇬 Египет", ng: "🇳🇬 Нигерия", za: "🇿🇦 ЮАР",
+  id: "🇮🇩 Индонезия", ph: "🇵🇭 Филиппины", mx: "🇲🇽 Мексика",
+  es: "🇪🇸 Испания", it: "🇮🇹 Италия", nl: "🇳🇱 Нидерланды",
+  ca: "🇨🇦 Канада", kr: "🇰🇷 Корея", hk: "🇭🇰 Гонконг",
+  sg: "🇸🇬 Сингапур", sa: "🇸🇦 Саудовская Аравия", ae: "🇦🇪 ОАЭ",
+  il: "🇮🇱 Израиль", kz: "🇰🇿 Казахстан", ru: "🇷🇺 Россия",
+  ch: "🇨🇭 Швейцария", se: "🇸🇪 Швеция", no: "🇳🇴 Норвегия",
+  dk: "🇩🇰 Дания", fi: "🇫🇮 Финляндия", cz: "🇨🇿 Чехия",
+  nz: "🇳🇿 Н. Зеландия", cl: "🇨🇱 Чили", co: "🇨🇴 Колумбия",
 };
 
 function convertToRub(price: number, currency: string) { return price * (RUB_RATES[currency] || 1); }
