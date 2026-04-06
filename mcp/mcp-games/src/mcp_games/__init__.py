@@ -12,12 +12,13 @@ from mcp.types import TextContent, Tool
 from pydantic import BaseModel, Field
 
 import urllib.request
+import urllib.error
 import os
 
 BACKEND_URL = os.environ.get("NANOBOT_LMS_BACKEND_URL", "http://backend:8000")
 
 
-def _fetch(path: str, params: dict | None = None) -> list[dict]:
+def _fetch_json(path: str, params: dict | None = None) -> list[dict] | dict:
     url = f"{BACKEND_URL}{path}"
     if params:
         qs = "&".join(f"{k}={v}" for k, v in params.items())
@@ -27,6 +28,24 @@ def _fetch(path: str, params: dict | None = None) -> list[dict]:
         return json.loads(resp.read())
 
 
+def _format_game(g: dict) -> str:
+    """Format a game dict into a readable string."""
+    name = g.get("name", "Unknown")
+    entries = g.get("price_entries", [])
+
+    # Find lowest price across all regions
+    prices = [(e.get("currency", "?"), e.get("current_price", 0))
+              for e in entries if e.get("current_price") is not None]
+    if prices:
+        best_currency, best_price = min(prices, key=lambda x: x[1])
+        price_str = f"{best_price:.2f} {best_currency}"
+    else:
+        price_str = "N/A"
+
+    platforms = ", ".join(g.get("platforms", []))
+    return f"- {name} — {price_str} [{platforms}]"
+
+
 # ── Tool schemas ──
 
 class NoArgs(BaseModel):
@@ -34,11 +53,11 @@ class NoArgs(BaseModel):
 
 
 class GenreQuery(BaseModel):
-    genre: str = Field(description="Genre filter, e.g. 'RPG', 'Action'")
+    genre: str = Field(description="Genre filter (deprecated, returns all games)")
 
 
 class SearchQuery(BaseModel):
-    q: str = Field(description="Search term for title or description")
+    q: str = Field(description="Search term for game title")
 
 
 class CheapestQuery(BaseModel):
@@ -48,36 +67,45 @@ class CheapestQuery(BaseModel):
 # ── Handlers ──
 
 async def _list_games(_args: BaseModel) -> str:
-    games = _fetch("/api/games")
+    games = _fetch_json("/api/games")
     if not games:
-        return "No games in catalog."
-    lines = [f"- {g['title']} — ${g['price']:.2f} [{', '.join(g.get('genres', []))}]" for g in games[:20]]
-    return "\n".join(lines)
+        return "No games in catalog yet. The price sync may still be running."
+    lines = [_format_game(g) for g in games[:20]]
+    return f"Found {len(games)} games:\n" + "\n".join(lines)
 
 
 async def _list_by_genre(args: BaseModel) -> str:
-    games = _fetch("/api/games", params={"genre": args.genre})
+    # Genre filtering not implemented in new schema — return all
+    games = _fetch_json("/api/games")
     if not games:
-        return f"No games found for genre '{args.genre}'."
-    lines = [f"- {g['title']} — ${g['price']:.2f}" for g in games[:20]]
-    return "\n".join(lines)
+        return "No games in catalog."
+    lines = [_format_game(g) for g in games[:20]]
+    return f"Showing all games (genre filter not available):\n" + "\n".join(lines)
 
 
 async def _search_games(args: BaseModel) -> str:
-    games = _fetch("/api/games/search/", params={"q": args.q})
+    games = _fetch_json("/api/games/search", params={"q": args.q})
     if not games:
         return f"No games found matching '{args.q}'."
-    lines = [f"- {g['title']} — ${g['price']:.2f} [{', '.join(g.get('genres', []))}]" for g in games[:10]]
-    return "\n".join(lines)
+    lines = [_format_game(g) for g in games[:10]]
+    return f"Found {len(games)} game(s):\n" + "\n".join(lines)
 
 
 async def _cheapest_games(args: BaseModel) -> str:
-    games = _fetch("/api/games", params={"limit": 200})
+    games = _fetch_json("/api/games", params={"limit": 200})
     if not games:
         return "No games in catalog."
-    games.sort(key=lambda g: g["price"])
-    lines = [f"- {g['title']} — ${g['price']:.2f}" for g in games[:args.limit]]
-    return "\n".join(lines)
+
+    # Sort by lowest price across all regions
+    def get_lowest_price(g: dict) -> float:
+        entries = g.get("price_entries", [])
+        prices = [e.get("current_price", 999999)
+                  for e in entries if e.get("current_price") is not None]
+        return min(prices) if prices else 999999
+
+    games.sort(key=get_lowest_price)
+    lines = [_format_game(g) for g in games[:args.limit]]
+    return f"Cheapest games:\n" + "\n".join(lines)
 
 
 # ── Tool registry ──
@@ -107,25 +135,25 @@ class ToolSpec:
 TOOL_SPECS = (
     ToolSpec(
         "list_games",
-        "List all games from the catalog (up to 20). Returns title, price, genres.",
+        "List all games from the catalog (up to 20). Returns name, lowest price, platforms.",
         NoArgs,
         _list_games,
     ),
     ToolSpec(
         "list_games_by_genre",
-        "List games filtered by genre.",
+        "List games (genre filter deprecated).",
         GenreQuery,
         _list_by_genre,
     ),
     ToolSpec(
         "search_games",
-        "Search games by title or description.",
+        "Search games by title.",
         SearchQuery,
         _search_games,
     ),
     ToolSpec(
         "cheapest_games",
-        "Get the cheapest games from the catalog.",
+        "Get the cheapest games from the catalog by lowest price across all regions.",
         CheapestQuery,
         _cheapest_games,
     ),
@@ -154,6 +182,8 @@ def create_server() -> Server:
             args = spec.model.model_validate(arguments or {})
             result = await spec.handler(args)
             return [TextContent(type="text", text=result)]
+        except urllib.error.URLError as exc:
+            return [TextContent(type="text", text=f"Backend connection error: {exc}")]
         except Exception as exc:
             return [TextContent(type="text", text=f"Error: {type(exc).__name__}: {exc}")]
 
