@@ -10,6 +10,7 @@ interface PriceEntry {
   original_price: number | null;
   discount_percent: number | null;
   collected_at: string;
+  store_url: string | null;
 }
 
 interface Game {
@@ -195,6 +196,16 @@ export default function GamesPage() {
                       {REGION_NAMES[bestEntry.region] || bestEntry.region}
                     </span>
                     <span className="best-rub">≈ {bestRub.toFixed(0)} ₽</span>
+                    {bestEntry.store_url && (
+                      <a
+                        href={bestEntry.store_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="best-link"
+                      >
+                        🛒 PS Store
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -224,6 +235,17 @@ export default function GamesPage() {
                               <span className="price-rub">
                                 ≈ {entry.rubEquivalent.toFixed(0)} ₽
                               </span>
+                              {entry.store_url && (
+                                <a
+                                  href={entry.store_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="price-link"
+                                  title="Открыть в PS Store"
+                                >
+                                  🔗
+                                </a>
+                              )}
                             </div>
                           );
                         })}
@@ -390,6 +412,22 @@ export default function GamesPage() {
           color: #2e7d32;
           margin-left: auto;
         }
+        .best-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 10px;
+          background: #1b5e20;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 6px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          transition: background 0.2s;
+        }
+        .best-link:hover {
+          background: #2e7d32;
+        }
         .all-prices {
           margin: 0.5rem 1rem 1rem;
         }
@@ -439,6 +477,15 @@ export default function GamesPage() {
           color: #666;
           min-width: 70px;
           text-align: right;
+        }
+        .price-link {
+          text-decoration: none;
+          font-size: 1rem;
+          margin-left: 6px;
+          transition: transform 0.2s;
+        }
+        .price-link:hover {
+          transform: scale(1.2);
         }
         .no-price {
           margin: 0.5rem 1rem 1rem;

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,
     ps_id INTEGER UNIQUE,
     sku VARCHAR(255),
+    sku_suffix VARCHAR(100),
     title_id VARCHAR(100),
     concept_id INTEGER,
     name VARCHAR(500) NOT NULL,

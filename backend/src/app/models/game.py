@@ -26,6 +26,7 @@ class Game(Base):
     # PSPricing identifiers
     ps_id: Mapped[int | None] = mapped_column(Integer, nullable=True, unique=True, index=True)
     sku: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    sku_suffix: Mapped[str | None] = mapped_column(String(100), nullable=True)
     title_id: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
     concept_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
 

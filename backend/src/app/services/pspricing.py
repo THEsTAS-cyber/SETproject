@@ -92,6 +92,7 @@ class PSPricingClient:
         return {
             "ps_id": item.get("id"),
             "sku": item.get("sku"),
+            "sku_suffix": item.get("sku_suffix"),
             "title_id": item.get("title_id"),
             "concept_id": item.get("concept_id"),
             "name": item.get("name", ""),

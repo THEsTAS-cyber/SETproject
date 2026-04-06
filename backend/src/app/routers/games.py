@@ -1,15 +1,59 @@
 """Game CRUD router."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.database import get_db_session
 from app.models.game import Game, PriceEntry
-from app.schemas.game import GameCreate, GameOut, GamePriceComparison
+from app.schemas.game import GameCreate, GameOut, GamePriceComparison, inject_store_urls
 
 router = APIRouter(prefix="/api/games", tags=["games"])
+
+
+def _games_response(games: list[Game]) -> JSONResponse:
+    """Convert games to dict and inject PS Store URLs."""
+    data = []
+    for g in games:
+        gd = {
+            "id": g.id,
+            "ps_id": g.ps_id,
+            "sku": g.sku,
+            "sku_suffix": g.sku_suffix,
+            "title_id": g.title_id,
+            "concept_id": g.concept_id,
+            "name": g.name,
+            "description": g.description,
+            "cover_url": g.cover_url,
+            "platforms": g.platforms,
+            "content_type": g.content_type,
+            "top_category": g.top_category,
+            "audio_languages": g.audio_languages,
+            "subtitle_languages": g.subtitle_languages,
+            "release_date": g.release_date.isoformat() if g.release_date else None,
+            "store_url": g.store_url,
+            "created_at": g.created_at.isoformat() if g.created_at else None,
+            "modified_at": g.modified_at.isoformat() if g.modified_at else None,
+            "last_synced_at": g.last_synced_at.isoformat() if g.last_synced_at else None,
+            "price_entries": [
+                {
+                    "id": pe.id,
+                    "region": pe.region,
+                    "currency": pe.currency,
+                    "current_price": pe.current_price,
+                    "original_price": pe.original_price,
+                    "discount_percent": pe.discount_percent,
+                    "ps_plus_price": pe.ps_plus_price,
+                    "collection": pe.collection,
+                    "collected_at": pe.collected_at.isoformat() if pe.collected_at else None,
+                }
+                for pe in g.price_entries
+            ],
+        }
+        data.append(inject_store_urls(gd))
+    return JSONResponse(content=data)
 
 
 @router.post("", response_model=GameOut, status_code=201)
@@ -30,7 +74,7 @@ async def list_games(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db_session),
-) -> list[Game]:
+) -> JSONResponse:
     """List all games with their price entries."""
     stmt = (
         select(Game)
@@ -40,7 +84,7 @@ async def list_games(
         .limit(limit)
     )
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    return _games_response(list(result.scalars().all()))
 
 
 # ── Specific paths MUST come before /{game_id} to avoid routing conflicts ──
@@ -50,7 +94,7 @@ async def list_games(
 async def search_games(
     q: str = Query(..., min_length=1),
     db: AsyncSession = Depends(get_db_session),
-) -> list[Game]:
+) -> JSONResponse:
     """Search games by name or description."""
     stmt = (
         select(Game)
@@ -64,14 +108,14 @@ async def search_games(
         .order_by(Game.created_at.desc())
     )
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    return _games_response(list(result.scalars().all()))
 
 
 @router.get("/compare", response_model=list[GamePriceComparison])
 async def compare_games_by_title(
     name: str = Query(..., min_length=1),
     db: AsyncSession = Depends(get_db_session),
-) -> list[dict]:
+) -> JSONResponse:
     """Find games by name and return their price comparisons."""
     stmt = (
         select(Game)
@@ -82,16 +126,34 @@ async def compare_games_by_title(
     result = await db.execute(stmt)
     games = list(result.scalars().all())
 
-    return [
-        {
+    data = []
+    for game in games:
+        gd = {
             "game_id": game.id,
             "name": game.name,
             "title_id": game.title_id,
+            "sku_suffix": game.sku_suffix,
             "cover_url": game.cover_url,
-            "prices": game.price_entries,
+            "price_entries": [
+                {
+                    "id": pe.id,
+                    "region": pe.region,
+                    "currency": pe.currency,
+                    "current_price": pe.current_price,
+                    "original_price": pe.original_price,
+                    "discount_percent": pe.discount_percent,
+                    "ps_plus_price": pe.ps_plus_price,
+                    "collection": pe.collection,
+                    "collected_at": pe.collected_at.isoformat() if pe.collected_at else None,
+                }
+                for pe in game.price_entries
+            ],
         }
-        for game in games
-    ]
+        # Rename price_entries to prices for comparison endpoint
+        gd["prices"] = gd.pop("price_entries")
+        inject_store_urls({"title_id": gd["title_id"], "sku_suffix": gd["sku_suffix"], "price_entries": gd["prices"]})
+        data.append(gd)
+    return JSONResponse(content=data)
 
 
 @router.get("/{game_id}", response_model=GameOut)
