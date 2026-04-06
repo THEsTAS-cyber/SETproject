@@ -1,7 +1,7 @@
 """Game CRUD router."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -41,6 +41,57 @@ async def list_games(
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+# ── Specific paths MUST come before /{game_id} to avoid routing conflicts ──
+
+
+@router.get("/search", response_model=list[GameOut])
+async def search_games(
+    q: str = Query(..., min_length=1),
+    db: AsyncSession = Depends(get_db_session),
+) -> list[Game]:
+    """Search games by name or description."""
+    stmt = (
+        select(Game)
+        .options(selectinload(Game.price_entries))
+        .where(
+            or_(
+                Game.name.ilike(f"%{q}%"),
+                Game.description.ilike(f"%{q}%"),
+            )
+        )
+        .order_by(Game.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+@router.get("/compare", response_model=list[GamePriceComparison])
+async def compare_games_by_title(
+    name: str = Query(..., min_length=1),
+    db: AsyncSession = Depends(get_db_session),
+) -> list[dict]:
+    """Find games by name and return their price comparisons."""
+    stmt = (
+        select(Game)
+        .options(selectinload(Game.price_entries))
+        .where(Game.name.ilike(f"%{name}%"))
+        .order_by(Game.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    games = list(result.scalars().all())
+
+    return [
+        {
+            "game_id": game.id,
+            "name": game.name,
+            "title_id": game.title_id,
+            "cover_url": game.cover_url,
+            "prices": game.price_entries,
+        }
+        for game in games
+    ]
 
 
 @router.get("/{game_id}", response_model=GameOut)
@@ -96,49 +147,3 @@ async def delete_game(
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     await db.delete(game)
-
-
-@router.get("/search/", response_model=list[GameOut])
-async def search_games(
-    q: str = Query(..., min_length=1),
-    db: AsyncSession = Depends(get_db_session),
-) -> list[Game]:
-    """Search games by title or description."""
-    stmt = (
-        select(Game)
-        .options(selectinload(Game.price_entries))
-        .where(
-            Game.name.ilike(f"%{q}%")
-            | (Game.description is not None and Game.description.ilike(f"%{q}%"))
-        )
-        .order_by(Game.created_at.desc())
-    )
-    result = await db.execute(stmt)
-    return list(result.scalars().all())
-
-
-@router.get("/compare/", response_model=list[GamePriceComparison])
-async def compare_games_by_title(
-    name: str = Query(..., min_length=1),
-    db: AsyncSession = Depends(get_db_session),
-) -> list[dict]:
-    """Find games by name and return their price comparisons."""
-    stmt = (
-        select(Game)
-        .options(selectinload(Game.price_entries))
-        .where(Game.name.ilike(f"%{name}%"))
-        .order_by(Game.created_at.desc())
-    )
-    result = await db.execute(stmt)
-    games = list(result.scalars().all())
-
-    return [
-        {
-            "game_id": game.id,
-            "name": game.name,
-            "title_id": game.title_id,
-            "cover_url": game.cover_url,
-            "prices": game.price_entries,
-        }
-        for game in games
-    ]

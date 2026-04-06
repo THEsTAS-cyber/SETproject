@@ -22,7 +22,7 @@ async def trigger_manual_sync(
     logger.info("Manual sync triggered via API")
     service = PriceSyncService(db)
     stats = await service.sync_all_regions()
-    await db.commit()
+    # No explicit commit needed — get_db_session commits automatically on success
     return {
         "status": "success",
         "message": "Price synchronization completed",
