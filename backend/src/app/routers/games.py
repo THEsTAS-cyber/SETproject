@@ -73,13 +73,14 @@ async def create_game(
 async def list_games(
     skip: int = Query(0, ge=0),
     limit: int = Query(500, ge=1, le=2000),
-    category: str | None = Query(None, description="Filter by content_type (game, bundle, etc.)"),
+    ps_only: bool = Query(True, description="Show only PlayStation games"),
     db: AsyncSession = Depends(get_db_session),
 ) -> JSONResponse:
-    """List all games with their price entries, optionally filtered by category."""
+    """List all games with their price entries."""
     stmt = select(Game).options(selectinload(Game.price_entries))
-    if category:
-        stmt = stmt.where(Game.content_type == category)
+    if ps_only:
+        # Filter: platforms array overlaps with ['PS5', 'PS4']
+        stmt = stmt.where(Game.platforms.op("&&")(["PS5", "PS4"]))
     stmt = stmt.order_by(Game.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return _games_response(list(result.scalars().all()))
