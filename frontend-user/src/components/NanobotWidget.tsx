@@ -8,12 +8,10 @@ interface Message {
 }
 
 /**
- * Nanobot-виджет: кнопка в углу → раскрывающееся чат-окно.
- *
- * Подключается к nanobot через WebSocket (/ws/chat).
- * Формат сообщений:
- *   Client → { "message": "текст" }
- *   Server → { "reply": "ответ" }
+ * Nanobot widget — connects to nanobot webchat via WebSocket.
+ * Protocol:
+ *   Client → { "content": "message" }
+ *   Server → { "type": "text", "content": "reply" }
  */
 export default function NanobotWidget() {
   const [open, setOpen] = useState(false);
@@ -24,31 +22,37 @@ export default function NanobotWidget() {
   const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Авто-скролл к последнему сообщению
+  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // WebSocket-подключение
+  // WebSocket connection
   useEffect(() => {
     if (!open) return;
 
-    // Определяем URL: в проде — через Caddy, локально — напрямую
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws/chat`;
+    const accessKey = "projectset-secret-key";
+    const wsUrl = `${protocol}//${window.location.host}/ws/chat?access_key=${accessKey}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
-    ws.onopen = () => setConnected(true);
-    ws.onclose = () => setConnected(false);
+    ws.onopen = () => {
+      console.log("Connected to nanobot");
+      setConnected(true);
+    };
+    ws.onclose = () => {
+      console.log("Disconnected from nanobot");
+      setConnected(false);
+    };
     ws.onerror = () => setConnected(false);
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        // Nanobot structured message: {type, content} or simple {reply}
-        const content = data.content ?? data.reply ?? "…";
+        // Nanobot structured message: {type, content}
+        const content = data.content ?? JSON.stringify(data);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content },
@@ -82,7 +86,7 @@ export default function NanobotWidget() {
     }
   };
 
-  // Кнопка-кружок (закрытое состояние)
+  // Collapsed — toggle button
   if (!open) {
     return (
       <button
@@ -104,7 +108,7 @@ export default function NanobotWidget() {
     );
   }
 
-  // Раскрытое окно чата
+  // Expanded — chat window
   return (
     <div className="nanobot-window">
       <div className="nanobot-header">
@@ -120,7 +124,7 @@ export default function NanobotWidget() {
       <div className="nanobot-messages">
         {messages.length === 0 && (
           <div className="msg assistant">
-            👋 Hi! Ask me anything about this project.
+            👋 Hi! Ask me about games, prices, or recommendations.
           </div>
         )}
         {messages.map((m, i) => (
