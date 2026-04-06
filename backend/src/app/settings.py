@@ -34,26 +34,22 @@ class Settings(BaseSettings):
     pspricing_regions: list[str] = Field(
         default=[
             # === Основные рынки ===
-            "us", "gb", "de", "fr", "jp", "au",  # уже были
-            # === Восточная Европа / СНГ ===
-            "ua", "pl", "ru", "kz", "by",  # уже были ua, pl
+            "us", "gb", "de", "fr", "jp", "au",
+            # === Восточная Европа ===
+            "ua", "pl",
             # === Дешёвые регионы (лучшие цены) ===
-            "tr", "ar", "th", "in", "eg", "ng", "za", "id", "ph", "mx",
+            "tr", "ar", "th", "in", "za", "id", "ph", "mx",
             # === Европа ===
             "es", "it", "nl", "be", "at", "ch", "se", "no", "dk", "fi",
-            "pt", "ie", "cz", "hu", "ro", "bg", "hr", "sk", "si", "lt",
-            "lv", "ee", "lu", "mt", "cy", "is", "gr",
+            "pt", "ie", "cz", "hu", "ro",
             # === Азия ===
-            "hk", "kr", "tw", "sg", "my", "vn",
+            "hk", "kr", "tw", "sg",
             # === Ближний Восток ===
-            "sa", "ae", "il", "qa", "kw", "bh", "om", "jo", "lb",
-            # === Африка ===
-            "ma", "eg",
+            "sa", "ae", "il",
             # === Северная Америка ===
-            "ca", "mx",
+            "ca",
             # === Южная Америка ===
-            "br", "cl", "co", "pe", "ec", "uy", "py", "bo", "ve",
-            "cr", "pa", "gt", "sv", "hn", "ni", "do",
+            "br", "cl", "co", "pe",
             # === Океания ===
             "nz",
         ],
