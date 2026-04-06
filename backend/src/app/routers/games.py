@@ -79,8 +79,10 @@ async def list_games(
     """List all games with their price entries."""
     stmt = select(Game).options(selectinload(Game.price_entries))
     if ps_only:
-        # Filter: platforms array overlaps with ['PS5', 'PS4'] (explicit text[] cast)
-        stmt = stmt.where(Game.platforms.overlap(["PS5", "PS4"]))
+        # Filter: platforms array overlaps with ['PS5', 'PS4'] (raw SQL with explicit text[] cast)
+        stmt = stmt.where(
+            text("games.platforms && ARRAY[:p1, :p2]::text[]").bindparams(p1="PS5", p2="PS4")
+        )
     stmt = stmt.order_by(Game.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return _games_response(list(result.scalars().all()))
