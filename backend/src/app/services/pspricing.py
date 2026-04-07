@@ -22,7 +22,7 @@ class PSPricingClient:
 
     async def fetch_collection(self, region: str) -> dict[str, Any] | None:
         """Fetch game collection data for a specific region."""
-        url = f"{self.base_url}/?region={region}&collection={self.collection}"
+        url = f"{self.base_url}?region={region}&collection={self.collection}"
 
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
