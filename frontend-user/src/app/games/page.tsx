@@ -25,24 +25,24 @@ const RUB_RATES: Record<string, number> = {
   NOK:8.6,CHF:104,CNY:12.8,
 };
 const REGION_NAMES: Record<string, string> = {
-  ae:"🇦 ОАЭ",ar:"🇷 Аргентина",at:"🇦🇹 Австрия",au:"🇦🇺 Австралия",
-  be:"🇧 Бельгия",bg:"🇬 Болгария",bh:"🇧 Бахрейн",bo:"🇧🇴 Боливия",
-  br:"🇧 Бразилия",ca:"🇨🇦 Канада",ch:"🇨 Швейцария",cl:"🇨🇱 Чили",
-  cn:"🇨🇳 Китай",co:"🇨🇴 Колумбия",cr:"🇨 Коста-Рика",cy:"🇨🇾 Кипр",
-  cz:"🇨🇿 Чехия",de:"🇩🇪 Германия",dk:"🇩🇰 Дания",ec:"🇪🇨 Эквадор",
-  es:"🇪🇸 Испания",fi:"🇫 Финляндия",fr:"🇫🇷 Франция",gb:"🇬 Великобритания",
-  gr:"🇬🇷 Греция",gt:"🇬 Гватемала",hk:"🇭🇰 Гонконг",hn:"🇭🇳 Гондурас",
-  hr:"🇭🇷 Хорватия",hu:"🇭 Венгрия",id:"🇩 Индонезия",ie:"🇮🇪 Ирландия",
-  il:"🇮🇱 Израиль",in:"🇮🇳 Индия",is:"🇮 Исландия",it:"🇮🇹 Италия",
-  jp:"🇯🇵 Япония",kr:"🇰🇷 Корея",kw:"🇰🇼 Кувейт",lb:"🇱🇧 Ливан",
-  lu:"🇱🇺 Люксембург",mt:"🇲🇹 Мальта",mx:"🇲🇽 Мексика",my:"🇲 Малайзия",
-  ni:"🇳🇮 Никарагуа",nl:"🇳 Нидерланды",no:"🇳🇴 Норвегия",nz:"🇳🇿 Н.Зеландия",
-  om:"🇴🇲 Оман",pa:"🇵🇦 Панама",pe:"🇵🇪 Перу",pl:"🇵🇱 Польша",
-  pt:"🇵 Португалия",py:"🇵🇾 Парагвай",qa:"🇶🇦 Катар",ro:"🇷🇴 Румыния",
-  ru:"🇷🇺 Россия",sa:"🇸🇦 Саудовская Аравия",se:"🇸🇪 Швеция",sg:"🇸🇬 Сингапур",
-  si:"🇸🇮 Словения",sk:"🇸🇰 Словакия",sv:"🇸🇻 Сальвадор",th:"🇹 Таиланд",
-  tr:"🇹🇷 Турция",tw:"🇹🇼 Тайвань",ua:"🇺🇦 Украина",us:"🇺🇸 США",
-  uy:"🇺🇾 Уругвай",za:"🇿🇦 ЮАР",
+  ae:"🇦🇪 UAE",ar:"🇦🇷 Argentina",at:"🇦🇹 Austria",au:"🇦🇺 Australia",
+  be:"🇧🇪 Belgium",bg:"🇧🇬 Bulgaria",bh:"🇧🇭 Bahrain",bo:"🇧🇴 Bolivia",
+  br:"🇧🇷 Brazil",ca:"🇨🇦 Canada",ch:"🇨🇭 Switzerland",cl:"🇨🇱 Chile",
+  cn:"🇨🇳 China",co:"🇨🇴 Colombia",cr:"🇨🇷 Costa Rica",cy:"🇨🇾 Cyprus",
+  cz:"🇨🇿 Czechia",de:"🇩🇪 Germany",dk:"🇩🇰 Denmark",ec:"🇪🇨 Ecuador",
+  es:"🇪🇸 Spain",fi:"🇫🇮 Finland",fr:"🇫🇷 France",gb:"🇬🇧 UK",
+  gr:"🇬🇷 Greece",gt:"🇬🇹 Guatemala",hk:"🇭🇰 Hong Kong",hn:"🇭🇳 Honduras",
+  hr:"🇭🇷 Croatia",hu:"🇭🇺 Hungary",id:"🇮🇩 Indonesia",ie:"🇮🇪 Ireland",
+  il:"🇮🇱 Israel",in:"🇮🇳 India",is:"🇮🇸 Iceland",it:"🇮🇹 Italy",
+  jp:"🇯🇵 Japan",kr:"🇰🇷 Korea",kw:"🇰🇼 Kuwait",lb:"🇱🇧 Lebanon",
+  lu:"🇱🇺 Luxembourg",mt:"🇲🇹 Malta",mx:"🇲🇽 Mexico",my:"🇲🇾 Malaysia",
+  ni:"🇳🇮 Nicaragua",nl:"🇳🇱 Netherlands",no:"🇳🇴 Norway",nz:"🇳🇿 New Zealand",
+  om:"🇴🇲 Oman",pa:"🇵🇦 Panama",pe:"🇵🇪 Peru",pl:"🇵🇱 Poland",
+  pt:"🇵🇹 Portugal",py:"🇵🇾 Paraguay",qa:"🇶🇦 Qatar",ro:"🇷🇴 Romania",
+  ru:"🇷🇺 Russia",sa:"🇸🇦 Saudi Arabia",se:"🇸🇪 Sweden",sg:"🇸🇬 Singapore",
+  si:"🇸🇮 Slovenia",sk:"🇸🇰 Slovakia",sv:"🇸🇻 El Salvador",th:"🇹🇭 Thailand",
+  tr:"🇹🇷 Turkey",tw:"🇹🇼 Taiwan",ua:"🇺🇦 Ukraine",us:"🇺🇸 USA",
+  uy:"🇺🇾 Uruguay",za:"🇿🇦 South Africa",
 };
 
 function convertToRub(p: number, c: string) { return p * (RUB_RATES[c] || 1); }
@@ -92,51 +92,51 @@ export default function GamesPage() {
       return(aB?.rub??Infinity)-(bB?.rub??Infinity);
     });
 
-  if(loading) return <div className="loading">Загрузка игр...</div>;
+  if(loading) return <div className="loading">Loading games...</div>;
 
   return (
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="title">🎮 Каталог PS Store</h1>
-          <p className="subtitle">{games.length} игр • {Object.keys(RUB_RATES).length} валют</p>
+          <h1 className="title">🎮 PS Store Catalog</h1>
+          <p className="subtitle">{games.length} games • {Object.keys(RUB_RATES).length} currencies</p>
         </div>
       </div>
 
       <div className="filters">
-        <input type="text" placeholder="🔍 Поиск по названию..." value={search} onChange={e=>setSearch(e.target.value)} className="search-input"/>
+        <input type="text" placeholder="🔍 Search by title..." value={search} onChange={e=>setSearch(e.target.value)} className="search-input"/>
         <div className="filter-group">
-          <span className="filter-label">Платформа:</span>
+          <span className="filter-label">Platform:</span>
           <div className="chip-group">
             {(["all","PS5","PS4"] as Platform[]).map(p=>(
               <button key={p} className={`chip ${platform===p?"chip-active":""}`} onClick={()=>setPlatform(p)}>
-                {p==="all"?"Все":p}
+                {p==="all"?"All":p}
               </button>
             ))}
           </div>
         </div>
         <div className="filter-group">
-          <span className="filter-label">Тип:</span>
+          <span className="filter-label">Type:</span>
           <div className="chip-group">
-            {([["all","Все"],["game","Игры"],["bundle","Наборы"],["add_on","Доп. контент"]] as [ContentType,string][]).map(([v,l])=>(
+            {([["all","All"],["game","Games"],["bundle","Bundles"],["add_on","DLC"]] as [ContentType,string][]).map(([v,l])=>(
               <button key={v} className={`chip ${type===v?"chip-active":""}`} onClick={()=>setType(v)}>{l}</button>
             ))}
           </div>
         </div>
         <div className="filter-group">
-          <span className="filter-label">Сортировка:</span>
+          <span className="filter-label">Sort:</span>
           <div className="chip-group">
-            {([["cheapest","💰 Цена"],["name","🔤 Название"],["discount","🔥 Скидка"]] as [typeof sortBy,string][]).map(([v,l])=>(
+            {([["cheapest","💰 Price"],["name","🔤 Name"],["discount","🔥 Discount"]] as [typeof sortBy,string][]).map(([v,l])=>(
               <button key={v} className={`chip ${sortBy===v?"chip-active":""}`} onClick={()=>setSortBy(v)}>{l}</button>
             ))}
           </div>
         </div>
       </div>
 
-      <p className="results-count">Показано: {filtered.length} из {games.length}</p>
+      <p className="results-count">Showing: {filtered.length} of {games.length}</p>
 
       {filtered.length===0?(
-        <div className="empty">{games.length===0?"📭 Каталог пуст. Подождите синхронизацию.":"🔍 Ничего не найдено."}</div>
+        <div className="empty">{games.length===0?"📭 Catalog is empty. Wait for price sync.":"🔍 Nothing found."}</div>
       ):(
         <div className="grid">
           {filtered.map(g=>{
@@ -153,12 +153,12 @@ export default function GamesPage() {
                   {g.cover_url?<img src={g.cover_url} alt={g.name} className="cover"/>:<div className="cover-placeholder">🎮</div>}
                   {g.platforms.length>0&&<div className="platforms">{g.platforms.map(p=><span key={p} className={`plat-badge ${p==="PS5"?"ps5":"ps4"}`}>{p}</span>)}</div>}
                   {maxDisc>0&&<div className="disc-badge">-{maxDisc}%</div>}
-                  {token&&<button className={`fav-btn ${isFav?"fav-active":""}`} onClick={()=>toggleFav(g.id)} title="В избранное">{isFav?"❤️":"🤍"}</button>}
+                  {token&&<button className={`fav-btn ${isFav?"fav-active":""}`} onClick={()=>toggleFav(g.id)} title="Add to wishlist">{isFav?"❤️":"🤍"}</button>}
                 </div>
                 <h2 className="game-name">{g.name}</h2>
                 {best&&(
                   <div className="best-price">
-                    <span className="best-label">Лучшая:</span>
+                    <span className="best-label">Best:</span>
                     <span className="best-value">{formatCur(best.entry.current_price!,best.entry.currency)}</span>
                     <span className="best-region">{REGION_NAMES[best.entry.region]||best.entry.region}</span>
                     <span className="best-rub">≈ {best.rub<1?best.rub.toFixed(2):best.rub.toFixed(0)} ₽</span>
@@ -168,7 +168,7 @@ export default function GamesPage() {
                 {prices.length>1&&(
                   <div className="all-prices">
                     <button className="toggle-btn" onClick={()=>setExpandedId(isExp?null:g.id)}>
-                      {isExp?"▲":"▼"} Все цены ({prices.length})
+                      {isExp?"▲":"▼"} All prices ({prices.length})
                     </button>
                     {isExp&&(
                       <div className="prices-list">
@@ -187,7 +187,7 @@ export default function GamesPage() {
                     )}
                   </div>
                 )}
-                {!best&&<div className="no-price">Цена недоступна</div>}
+                {!best&&<div className="no-price">Price unavailable</div>}
               </div>
             );
           })}

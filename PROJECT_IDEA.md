@@ -1,74 +1,75 @@
-# Project Idea — Game Catalog
+# Project Idea — PS Store Price Comparator
 
 ## Product Definition
 
-**End-user:** Gamers looking for a curated, searchable catalog of games with pricing and metadata.
+**End-user:** Gamers from Russia and CIS who use foreign PlayStation accounts (Turkey, Argentina, Poland, etc.) due to PS Store restrictions in their region.
 
-**Problem:** Game stores are fragmented across multiple platforms (Steam, Epic, GOG). Users waste time comparing prices, finding new releases, and discovering deals. A single curated catalog with an AI assistant solves this.
+**Problem:** After the PS Store suspension in Russia, users must find which region offers the lowest price for a specific game. This requires visiting each region's store individually, manually converting currencies, and tracking discounts. It is tedious and time-consuming.
 
-**Product in one sentence:** A curated game catalog with an AI-powered assistant that helps users discover games, compare prices, and find the best deals.
+**Product in one sentence:** A unified PS Store price comparison tool that automatically collects prices from 67 regions, converts them to rubles, and highlights the best deal for each game.
 
-**Core feature:** Searchable game catalog with an AI chat assistant (nanobot) that answers natural-language questions like "what are the cheapest games right now?" or "show me new releases."
+**Core feature:** Automated price collection from 67 PS Store regions every 12 hours with ruble conversion and best-price highlighting.
 
 ---
 
 ## Implementation Plan
 
-### Version 1 — Curated Game Catalog
+### Version 1 — PS Store Price Catalog
 
-**Does one thing well:** Browse and search a manually curated game catalog with AI-powered Q&A.
+**Does one thing well:** Browse and compare game prices across 67 PS Store regions with AI-powered Q&A.
 
 **Backend:**
-- FastAPI REST API with CRUD for games
-- Endpoints: `GET /games`, `GET /games/{id}`, `GET /games/search?q=`, `POST /games` (admin)
+- FastAPI REST API with game catalog and price data
+- Endpoints: `GET /games`, `GET /games/{id}`, `GET /games/search?q=`, `POST /auth/register`, `POST /auth/login`
 - PostgreSQL database with SQLAlchemy
+- Scheduled ETL job to fetch prices from PSPricing API every 12 hours
 
 **Database:**
 - `games` table: id, title, description, price, release_date, genres (array), rating, cover_url, created_at
-
-**Admin panel (frontend-admin):**
-- Simple form to add/edit/delete games
-- Protected by a basic admin password or hardcoded check
+- `users` table with JWT auth
+- `wishlist` table for user favorites
 
 **User panel (frontend-user):**
-- Game catalog grid with search and filters (by genre, price)
-- Game detail page
+- Game catalog grid with search and filters (platform, type, genre)
+- Game detail page with price comparison across 67 regions
+- Wishlist page
 - Nanobot chat widget (bottom-right corner)
 
 **Nanobot:**
-- MCP tool that queries the backend API (`GET /games`, search)
-- Answers questions: "cheapest games", "new releases", "RPG games under $20"
+- MCP tools that query the backend API (`GET /games`, search, cheapest)
+- Answers questions: "show me cheap games", "find Elden Ring", "what RPG games do you have?"
 - Connected to Qwen via qwen-code-api
 
-**Deliverable:** Fully functional catalog — admins add games, users browse + ask nanobot.
+**Deliverable:** Fully functional price catalog — games are auto-imported, users browse + compare prices + ask nanobot.
 
 ---
 
-### Version 2 — PS Store Aggregator
+### Version 2 — Enhanced Experience
 
 **Builds on V1:**
-- Automated game import from **PS Store** API instead of manual entry
-- Price tracking: track price history, show discounts
-- User favorites/wishlist
-- Nanobot gets new MCP tools: price comparison, discount alerts, recommendations
+- Price history chart on game page
+- Price drop notifications for wishlist items (email or in-app)
+- Export price list to CSV
+- Side-by-side game comparison
 - Deploy to a public URL (VPS + Caddy with HTTPS)
 
 **New backend features:**
-- ETL pipeline to fetch games from PS Store API on a schedule (cron / Celery beat)
-- Price history table
-- User accounts with favorites
+- Price history tracking table
+- Notification service for wishlist items
+- User accounts with enhanced profiles
 
 **New frontend features:**
 - Price history chart on game page
-- "On sale" section on homepage
-- User favorites page
+- Notifications center
+- Export button (CSV)
+- Comparison view for two games
 
 **Nanobot improvements:**
-- "What dropped in price the most on PS Store?"
-- "Recommend me a PS5 RPG under $15"
+- "Which game dropped in price the most?"
 - "Notify me when God of War goes on sale"
+- "Compare Elden Ring and Baldur's Gate 3 prices"
 
-**Deliverable:** Public-facing PS Store game aggregator with automated data, deployed and available for use.
+**Deliverable:** Public-facing PS Store price comparator with price history, notifications, and deployed availability.
 
 ---
 
@@ -88,6 +89,8 @@ Version 1:
                         ├──────────────→ [FastAPI Backend]
                         │                       │
                         │                  [PostgreSQL]
+                        │                       │
+                        │              [PSPricing API (ETL)]
                         │
-                        └──────────────→ [Next.js Admin Panel]
+                        └──────────────→ [Admin Panel (future)]
 ```

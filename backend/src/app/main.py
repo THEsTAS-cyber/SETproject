@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
-from app.scheduler import scheduler
 from app.settings import settings
 
 
@@ -21,13 +20,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await init_db()
     print("Database tables ready.")
 
-    # Start price sync scheduler
-    await scheduler.start()
-
     yield
 
-    # Stop price sync scheduler
-    await scheduler.stop()
     print(f"Shutting down {settings.name}...")
 
 
@@ -55,11 +49,10 @@ def create_app() -> FastAPI:
         return {"status": "ok", "service": settings.name}
 
     # Include routers
-    from app.routers import admin, auth, favorites, games
+    from app.routers import auth, favorites, games
     app.include_router(auth.router)
     app.include_router(games.router)
     app.include_router(favorites.router)
-    app.include_router(admin.router)
 
     return app
 

@@ -6,7 +6,7 @@ import NanobotWidget from "@/components/NanobotWidget";
 
 export const metadata: Metadata = {
   title: "ProjectSET — PS Store Prices",
-  description: "Сравнение цен игр в PS Store по регионам",
+  description: "Compare game prices across 67 PS Store regions",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="en">
       <body>
         <AuthProvider>
           <header className="header">
@@ -24,8 +24,8 @@ export default function RootLayout({
                 <a href="/games" className="nav-logo">🎮 PS Prices</a>
               </div>
               <div className="nav-links">
-                <a href="/games" className="nav-link">Каталог</a>
-                <a href="/favorites" className="nav-link">Избранное</a>
+                <a href="/games" className="nav-link">Catalog</a>
+                <a href="/favorites" className="nav-link">Wishlist</a>
               </div>
               <div className="nav-right">
                 <AuthNav />

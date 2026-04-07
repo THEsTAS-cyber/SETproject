@@ -11,22 +11,7 @@
     respond @public-utils-denied "Forbidden" 403
     respond @unknown-utils "Not Found" 404
 
-    # Admin panel — /admin/* → frontend-admin
-    handle_path /admin* {
-        reverse_proxy http://frontend-admin:3001
-    }
-
-    # Nanobot WebSocket — /ws/chat → nanobot
-    handle /ws/chat {
-        reverse_proxy http://nanobot:8765
-    }
-
-    # Backend API — /api/* → backend
-    handle /api* {
-        reverse_proxy http://backend:{$BACKEND_CONTAINER_PORT}
-    }
-
-    # User panel — everything else → frontend-user
+    # User panel — everything goes to Next.js frontend
     handle {
         reverse_proxy http://frontend-user:3000
     }
@@ -35,7 +20,7 @@
         reverse_proxy http://pgadmin:{$CONST_PGADMIN_CONTAINER_PORT}
     }
 
-    # Swagger docs и OpenAPI — напрямую через backend
+    # Swagger docs and OpenAPI — directly via backend
     handle /docs* {
         reverse_proxy http://backend:{$BACKEND_CONTAINER_PORT}
     }

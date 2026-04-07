@@ -28,9 +28,9 @@ const RUB_RATES: Record<string, number> = {
 };
 
 const REGION_NAMES: Record<string, string> = {
-  ua: "🇺🇦 Украина", us: "🇺🇸 США", gb: "🇬🇧 Великобритания",
-  de: "🇩🇪 Германия", fr: "🇫🇷 Франция", pl: "🇵🇱 Польша",
-  tr: "🇹🇷 Турция", jp: "🇯🇵 Япония", br: "🇧🇷 Бразилия", au: "🇦🇺 Австралия",
+  ua: "🇺🇦 Ukraine", us: "🇺🇸 USA", gb: "🇬🇧 UK",
+  de: "🇩🇪 Germany", fr: "🇫🇷 France", pl: "🇵🇱 Poland",
+  tr: "🇹🇷 Turkey", jp: "🇯🇵 Japan", br: "🇧🇷 Brazil", au: "🇦🇺 Australia",
 };
 
 function convertToRub(price: number, currency: string): number {
@@ -85,15 +85,15 @@ export default function FavoritesPage() {
     }, { entry: valid[0], rub: convertToRub(valid[0].current_price!, valid[0].currency) });
   };
 
-  if (loading) return <div className="loading">Загрузка...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
 
   return (
     <div className="page">
-      <h1 className="title">⭐ Избранное</h1>
+      <h1 className="title">⭐ Wishlist</h1>
       {games.length === 0 ? (
         <div className="empty">
-          <p>У вас пока нет избранных игр.</p>
-          <a href="/games" className="browse-link">Перейти в каталог →</a>
+          <p>No games in your wishlist yet.</p>
+          <a href="/games" className="browse-link">Browse catalog →</a>
         </div>
       ) : (
         <div className="grid">
@@ -119,7 +119,7 @@ export default function FavoritesPage() {
                   className="toggle-btn"
                   onClick={() => setExpandedId(isExpanded ? null : game.id)}
                 >
-                  {isExpanded ? "▲" : "▼"} Все цены
+                  {isExpanded ? "▲" : "▼"} All prices
                 </button>
                 {isExpanded && (
                   <div className="prices-list">
@@ -138,7 +138,7 @@ export default function FavoritesPage() {
                   </div>
                 )}
                 <button className="remove-btn" onClick={() => removeFavorite(game.id)}>
-                  ❤️‍🔥 Удалить из избранного
+                  ❤️‍🔥 Remove from wishlist
                 </button>
               </div>
             );

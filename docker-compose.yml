@@ -74,11 +74,10 @@ services:
       - app-network
     environment:
       - BACKEND_URL=http://backend:${BACKEND_CONTAINER_PORT:-8000}
-      - NANOBOT_URL=http://nanobot:${NANOBOT_CONTAINER_PORT:-8765}
     depends_on:
       - backend
 
-  # ── Nanobot — AI-агент с MCP-тулзами ──
+  # ── Nanobot — AI agent with MCP tools ──
   nanobot:
     build:
       context: ./nanobot
@@ -104,7 +103,7 @@ services:
       - backend
       - qwen-code-api
 
-  # ── Qwen Code API — прокси к LLM ──
+  # ── Qwen Code API — LLM proxy ──
   qwen-code-api:
     build:
       context: ./qwen-code-api
@@ -139,17 +138,6 @@ services:
       retries: 3
       start_period: 10s
 
-  frontend-admin:
-    build:
-      context: ./frontend-admin
-    restart: unless-stopped
-    networks:
-      - app-network
-    environment:
-      - BACKEND_URL=http://backend:${BACKEND_CONTAINER_PORT:-8000}
-    depends_on:
-      - backend
-
   caddy:
     image: ${REGISTRY_PREFIX_DOCKER_HUB:-}caddy:2.11-alpine
     networks:
@@ -157,7 +145,6 @@ services:
     depends_on:
       - backend
       - frontend-user
-      - frontend-admin
       - postgres
       - qwen-code-api
     environment:
@@ -165,7 +152,6 @@ services:
       - BACKEND_CONTAINER_PORT=${BACKEND_CONTAINER_PORT:-8000}
       - CONST_PGADMIN_CONTAINER_PORT=${CONST_PGADMIN_CONTAINER_PORT:-80}
       - QWEN_CODE_API_CONTAINER_PORT=${QWEN_CODE_API_CONTAINER_PORT:-8080}
-      - NANOBOT_CONTAINER_PORT=${NANOBOT_CONTAINER_PORT:-8765}
     ports:
       - ${GATEWAY_HOST_ADDRESS:-0.0.0.0}:${GATEWAY_HOST_PORT:-42002}:${CADDY_CONTAINER_PORT:-80}
     volumes:

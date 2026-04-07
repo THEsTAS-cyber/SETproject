@@ -1,31 +1,31 @@
 # ProjectSET — PS Store Price Comparator
 
-**Сравнение цен игр PlayStation Store по 67 регионам мира** — находите самые выгодные предложения и покупайте игры дешевле.
+Compare PlayStation Store game prices across 67 regions worldwide — find the best deals and buy games cheaper.
 
 ## Demo
 
-> *Скриншоты будут добавлены после деплоя:*
-> 1. Главная страница — каталог игр PS4/PS5 с ценами
-> 2. Карточка игры — сравнение цен по всем регионам
-> 3. Страница избранного
+> *Screenshots will be added after deployment:*
+> 1. Homepage — PS4/PS5 game catalog with prices
+> 2. Game page — price comparison across all regions
+> 3. Wishlist / Favorites page
 
 ## Product Context
 
 ### End Users
 
-- **Геймеры из России и стран СНГ**, которые используют зарубежные аккаунты PlayStation (Турция, Аргентина, Польша и др.) из-за ограничений российского PS Store.
-- **Покупатели**, ищущие регион с самой низкой ценой на конкретную игру.
-- **Экономные геймеры**, отслеживающие скидки и распродажи.
+- **Gamers from Russia and CIS countries** who use foreign PlayStation accounts (Turkey, Argentina, Poland, etc.) due to restrictions on the Russian PS Store.
+- **Shoppers** looking for the region with the lowest price for a specific game.
+- **Budget-conscious gamers** tracking discounts and sales.
 
 ### Problem
 
-После приостановки работы PS Store в России пользователи вынуждены заводить аккаунты в других странах. Но найти, где игра стоит дешевле — сложно: нужно заходить в каждый регион по отдельности, конвертировать валюты вручную, отслеживать скидки. Сравнение цен становится утомительным и отнимает много времени.
+After the suspension of the PS Store in Russia, users are forced to create accounts in other countries. But finding where a game is cheapest is difficult: you need to visit each region's store individually, manually convert currencies, and track discounts. Price comparison becomes tedious and time-consuming.
 
 ### Our Solution
 
-Единый каталог, который **автоматически собирает цены** из 67 регионов PS Store каждые 12 часов, конвертирует их в рубли и показывает **самую выгодную покупку** для каждой игры. Пользователь видит: в какой стране игра дешевле всего, и может перейти прямо на страницу покупки в PS Store нужного региона.
+A unified catalog that **automatically collects prices** from 67 PS Store regions every 12 hours, converts them to rubles, and shows the **best deal** for each game. Users see: which country has the cheapest price, and can go directly to the purchase page in the desired region's PS Store.
 
-> **Важно:** Парсятся **только игры для PlayStation (PS4/PS5)**. Игры из Epic Games Store, Steam и других платформ не отображаются.
+> **Important:** We only parse **PlayStation games (PS4/PS5)**. Games from Epic Games Store, Steam, and other platforms are not displayed.
 
 ## Features
 
@@ -33,49 +33,49 @@
 
 | Feature | Description |
 |---------|-------------|
-| **Парсинг цен из 67 регионов PS Store** | Автоматический сбор данных каждые 12 часов через PSPricing API |
-| **Фильтр: только PlayStation** | Показываются только PS4/PS5 игры, без Epic/Steam |
-| **Каталог с обложками и платформами** | Бейджи PS5/PS4, обложки, скидки |
-| **Пересчёт цен в рубли** | Актуальные курсы для 40+ валют |
-| **Подсветка лучшей цены** | Зелёным выделяется регион с минимальной ценой в рублях |
-| **Все цены по регионам** | Раскрывающийся список с 67 ценами |
-| **Прямые ссылки на PS Store** | Кнопка «🛒 PS Store» ведёт на страницу покупки в нужном регионе |
-| **Поиск по названию** | Мгновенный поиск по каталогу |
-| **Фильтр по платформе** | Все / PS5 / PS4 |
-| **Фильтр по типу** | Все / Игры / Наборы / DLC |
-| **Сортировка** | По выгодной цене / По названию / По скидке |
-| **Регистрация и авторизация** | JWT-токены, пароль хешируется bcrypt |
-| **Избранное (wishlist)** | Сохранение игр в личном профиле |
-| **AI-ассистент (nanobot)** | Чат-бот в углу экрана для вопросов об играх |
-| **Адаптивный дизайн** | Мобильная версия, чат на полный экран |
+| **Price parsing from 67 PS Store regions** | Automatic data collection every 12 hours via PSPricing API |
+| **PlayStation-only filter** | Only PS4/PS5 games shown, no Epic/Steam |
+| **Catalog with covers and platforms** | PS5/PS4 badges, covers, discounts |
+| **Price conversion to rubles** | Live exchange rates for 40+ currencies |
+| **Best price highlight** | Green highlight on the region with the lowest ruble price |
+| **All prices by region** | Expandable list with all 67 prices |
+| **Direct PS Store links** | "🛒 PS Store" button goes to the purchase page in the selected region |
+| **Search by title** | Instant catalog search |
+| **Platform filter** | All / PS5 / PS4 |
+| **Type filter** | All / Games / Bundles / DLC |
+| **Sorting** | By best price / By name / By discount |
+| **Registration & authentication** | JWT tokens, bcrypt password hashing |
+| **Wishlist** | Save games to your personal profile |
+| **AI assistant (nanobot)** | Chat widget in the corner for game-related questions |
+| **Responsive design** | Mobile-friendly, fullscreen chat on mobile |
 
 ### Not Yet Implemented (Version 2)
 
 | Feature | Priority |
 |---------|----------|
-| История изменения цен (график) | Medium |
-| Уведомления о снижении цены на избранное | High |
-| Экспорт списка цен в CSV | Low |
-| Сравнение двух игр бок о бок | Medium |
-| Отображение DLC и дополнений | Low |
+| Price history chart | Medium |
+| Price drop notifications for wishlist items | High |
+| Export price list to CSV | Low |
+| Side-by-side game comparison | Medium |
+| DLC and add-ons display | Low |
 
 ## Usage
 
-### Основной сценарий
+### Main Scenario
 
-1. **Откройте сайт** — `http://<IP-вашей-VM>:42002`
-2. **Найдите игру** через поиск или пролистайте каталог.
-3. **Посмотрите лучшую цену** — она подсвечена зелёным в карточке.
-4. **Раскройте «Все цены»** — увидите полный список по всем 67 регионам с пересчётом в рубли.
-5. **Нажмите «🛒 PS Store»** — перейдёте на страницу покупки в нужном регионе.
-6. **Добавьте в избранное** ❤️ — игра сохранится в вашем профиле.
+1. **Open the site** — `http://<your-VM-IP>:42002`
+2. **Find a game** using search or browse the catalog.
+3. **Check the best price** — highlighted in green on the game card.
+4. **Expand "All prices"** — see the full list across all 67 regions with ruble conversion.
+5. **Click "🛒 PS Store"** — go to the purchase page in the desired region.
+6. **Add to wishlist** ❤️ — the game is saved to your profile.
 
-### AI-ассистент
+### AI Assistant
 
-Нажмите на кнопку 💬 в правом нижнем углу и спросите, например:
-- *«Покажи дешёвые игры»*
-- *«Найди Elden Ring»*
-- *«Какие есть RPG?»*
+Click the 💬 button in the bottom-right corner and ask, for example:
+- *"Show me cheap games"*
+- *"Find Elden Ring"*
+- *"What RPG games are available?"*
 
 ## Deployment
 
@@ -88,7 +88,7 @@
 
 ### Step-by-Step Instructions
 
-To use AI assistent you need to authorize your account in nanobot in QWEN and have .qwen/oauth_creds.json file
+To use the AI assistant, you need to authorize your account in Qwen and have a `.qwen/oauth_creds.json` file.
 
 ```bash
 # 1. Clone the repository
@@ -97,18 +97,18 @@ cd SETproject
 
 # 2. Create environment file
 cp .env.docker.example .env
-# Отредактируйте .env при необходимости (пароль БД, JWT secret и т.д.)
+# Edit .env if needed (DB password, JWT secret, etc.)
 
-# 3. Запустите все сервисы
+# 3. Start all services
 docker compose up -d --build
 
-# 4. Дождитесь готовности (~30 секунд)
+# 4. Wait for readiness (~30 seconds)
 docker compose ps
 
-# 5. Проверьте работоспособность бэкенда
+# 5. Check backend health
 curl http://localhost:42001/health
 
-# 6. Убедитесь, что синхронизация цен запущена
+# 6. Verify price sync is running
 docker compose logs backend --tail=30
 ```
 
@@ -116,15 +116,15 @@ docker compose logs backend --tail=30
 
 | Service | Port | Description |
 |---------|------|-------------|
-| **Caddy (gateway)** | `42002` | Точка входа, обратный прокси |
+| **Caddy (gateway)** | `42002` | Entry point, reverse proxy |
 | **Backend API** | `42001` | FastAPI + PostgreSQL |
-| **pgAdmin** | `42003` | Панель управления БД |
-| **Nanobot (AI)** | `42006` | WebSocket чат-ассистент |
-| **Qwen Code API** | `42005` | Прокси к LLM |
+| **pgAdmin** | `42003` | Database management panel |
+| **Nanobot (AI)** | `42006` | WebSocket chat assistant |
+| **Qwen Code API** | `42005` | LLM proxy |
 
 ### Access Points
 
-- **Фронтенд:** `http://<VM_IP>:42002`
+- **Frontend:** `http://<VM_IP>:42002`
 - **pgAdmin:** `http://<VM_IP>:42003` (login: `admin@example.com` / `admin`)
 - **Backend API:** `http://<VM_IP>:42001`
 
@@ -132,7 +132,7 @@ docker compose logs backend --tail=30
 
 ```bash
 docker compose down
-# Чтобы удалить данные БД:
+# To remove database data:
 docker compose down -v
 ```
 
@@ -154,4 +154,4 @@ docker compose up -d --build
 | **Gateway** | Caddy 2 |
 | **Orchestration** | Docker Compose |
 | **Package Manager** | uv |
-| **Data Source** | PSPricing B2B API (67 регионов) |
+| **Data Source** | PSPricing B2B API (67 regions) |

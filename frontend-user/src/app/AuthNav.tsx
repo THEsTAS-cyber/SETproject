@@ -8,8 +8,8 @@ export default function AuthNav() {
   if (!user) {
     return (
       <div className="auth-nav">
-        <a href="/auth/login" className="auth-link">Войти</a>
-        <a href="/auth/register" className="auth-link auth-register">Регистрация</a>
+        <a href="/auth/login" className="auth-link">Login</a>
+        <a href="/auth/register" className="auth-link auth-register">Register</a>
       </div>
     );
   }
@@ -17,7 +17,7 @@ export default function AuthNav() {
   return (
     <div className="auth-nav">
       <span className="auth-user">👤 {user.username}</span>
-      <button onClick={logout} className="auth-logout">Выйти</button>
+      <button onClick={logout} className="auth-logout">Logout</button>
     </div>
   );
 }

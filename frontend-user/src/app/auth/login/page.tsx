@@ -29,29 +29,29 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Вход</h1>
+        <h1>Login</h1>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Имя пользователя"
+            placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Пароль"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
           {error && <p className="auth-error">{error}</p>}
           <button type="submit" disabled={loading}>
-            {loading ? "Вход..." : "Войти"}
+            {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
         <p className="auth-switch">
-          Нет аккаунта? <a href="/auth/register">Зарегистрироваться</a>
+          No account? <a href="/auth/register">Register</a>
         </p>
       </div>
       <style jsx>{`

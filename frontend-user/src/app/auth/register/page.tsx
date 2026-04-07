@@ -30,11 +30,11 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Регистрация</h1>
+        <h1>Register</h1>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Имя пользователя"
+            placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -49,7 +49,7 @@ export default function RegisterPage() {
           />
           <input
             type="password"
-            placeholder="Пароль (мин. 6 символов)"
+            placeholder="Password (min. 6 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -57,11 +57,11 @@ export default function RegisterPage() {
           />
           {error && <p className="auth-error">{error}</p>}
           <button type="submit" disabled={loading}>
-            {loading ? "Регистрация..." : "Зарегистрироваться"}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
         <p className="auth-switch">
-          Уже есть аккаунт? <a href="/auth/login">Войти</a>
+          Already have an account? <a href="/auth/login">Log In</a>
         </p>
       </div>
       <style jsx>{`
