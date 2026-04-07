@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
+from app.scheduler import scheduler
 from app.settings import settings
 
 
@@ -18,10 +19,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Create tables if they don't exist
     print("Initializing database tables...")
     await init_db()
+
+    # Seed sample games if database is empty
+    from app.seed import seed_db
+    await seed_db(settings.database_url)
+
+    # Start price sync scheduler
+    await scheduler.start()
     print("Database tables ready.")
 
     yield
 
+    # Stop price sync scheduler
+    await scheduler.stop()
     print(f"Shutting down {settings.name}...")
 
 
