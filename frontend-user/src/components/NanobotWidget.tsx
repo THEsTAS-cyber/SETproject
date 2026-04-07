@@ -107,7 +107,7 @@ export default function NanobotWidget() {
       <div className="nanobot-messages">
         {messages.length === 0 && (
           <div className="msg assistant">
-            👋 Привет! Спросите меня об играх, ценах или рекомендациях.
+            👋 Hi! Ask me about games, prices, or recommendations.
           </div>
         )}
         {messages.map((m, i) => (
