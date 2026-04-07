@@ -6,6 +6,8 @@ Compare PlayStation Store game prices across 67 regions worldwide — find the b
 
 > 1. Game page — price comparison across all regions <img width="1910" height="1194" alt="Screenshot2" src="https://github.com/user-attachments/assets/2459554c-ba5f-4a64-adb8-6384e059101d" />
 > 2. Wishlist / Favorites page <img width="1919" height="1199" alt="Screenshot1" src="https://github.com/user-attachments/assets/9b4e0b11-97f6-4d6d-a674-13c82dc304b3" />
+> 3. Assistent dialog <img width="498" height="696" alt="ScreenshotAssistent" src="https://github.com/user-attachments/assets/f4e0ee94-4b9a-4fc3-802a-7c44c31d59e4" />
+
 
 
 ## Product Context
