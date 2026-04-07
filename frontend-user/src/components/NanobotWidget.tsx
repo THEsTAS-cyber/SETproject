@@ -99,7 +99,7 @@ export default function NanobotWidget() {
     <div className="nanobot-window">
       <div className="nanobot-header">
         <span>
-          Ассистент
+          Assistent
           <span className={`status-dot ${connected ? "online" : "offline"}`} />
         </span>
         <button className="nanobot-close" onClick={() => setOpen(false)}>&times;</button>
@@ -124,7 +124,7 @@ export default function NanobotWidget() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={connected ? "Напишите сообщение…" : "Подключение…"}
+          placeholder={connected ? "Send a message…" : "Connecting…"}
           disabled={loading}
         />
         <button type="submit" disabled={loading || !input.trim()}>
