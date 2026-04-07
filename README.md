@@ -90,8 +90,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/ProjectSET.git
-cd ProjectSET
+git clone https://github.com/THEsTAS-cyber/SETproject.git
+cd SETproject
 
 # 2. Create environment file
 cp .env.docker.example .env
