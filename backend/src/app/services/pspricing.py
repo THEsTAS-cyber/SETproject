@@ -29,7 +29,7 @@ class PSPricingClient:
         Returns:
             Parsed JSON response or None on error
         """
-        url = f"{self.base_url}?region={region}&collection={self.collection}"
+        url = f"{self.base_url}/?region={region}&collection={self.collection}"
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 resp = await client.get(url)
