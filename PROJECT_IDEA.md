@@ -2,81 +2,67 @@
 
 ## Product Definition
 
-**End-user:** Gamers from Russia and CIS who use foreign PlayStation accounts (Turkey, Argentina, Poland, etc.) due to PS Store restrictions in their region.
+**End-user:** Gamers from Russia and CIS countries who use foreign PlayStation accounts (Turkey, Argentina, Poland, etc.) due to PS Store restrictions in their region.
 
-**Problem:** After the PS Store suspension in Russia, users must find which region offers the lowest price for a specific game. This requires visiting each region's store individually, manually converting currencies, and tracking discounts. It is tedious and time-consuming.
+**Problem:** After the PS Store suspension in Russia, users must create accounts in other countries. Finding where a game is cheapest requires visiting each region's store individually, manually converting currencies, and tracking discounts. Price comparison is tedious and time-consuming.
 
 **Product in one sentence:** A unified PS Store price comparison tool that automatically collects prices from 67 regions, converts them to rubles, and highlights the best deal for each game.
 
-**Core feature:** Automated price collection from 67 PS Store regions every 12 hours with ruble conversion and best-price highlighting.
+**Core feature:** Automated price collection from 67 PS Store regions with ruble conversion, best-price highlighting, and direct PS Store links for each region.
 
 ---
 
 ## Implementation Plan
 
-### Version 1 — PS Store Price Catalog
+### Version 1 — Manual Game Catalog
 
-**Does one thing well:** Browse and compare game prices across 67 PS Store regions with AI-powered Q&A.
+**Does one thing well:** Browse a manually curated game catalog with basic price info.
+
+**What was missing:**
+- Admins added games manually (no API integration)
+- No user registration or authentication
+- No wishlist/favorites
+- Nanobot assistant had no MCP tools — couldn't query the catalog, only responded with generic answers
+- No PS Store links to actual purchase pages
 
 **Backend:**
-- FastAPI REST API with game catalog and price data
-- Endpoints: `GET /games`, `GET /games/{id}`, `GET /games/search?q=`, `POST /auth/register`, `POST /auth/login`
-- PostgreSQL database with SQLAlchemy
-- Scheduled ETL job to fetch prices from PSPricing API every 12 hours
+- FastAPI REST API with basic game CRUD
+- PostgreSQL with simple `games` table
+- Price data entered manually by admins
 
-**Database:**
-- `games` table: id, title, description, price, release_date, genres (array), rating, cover_url, created_at
-- `users` table with JWT auth
-- `wishlist` table for user favorites
+**Frontend:**
+- Simple game catalog page with static data
+- No authentication UI
+- No AI assistant widget
 
-**User panel (frontend-user):**
-- Game catalog grid with search and filters (platform, type, genre)
-- Game detail page with price comparison across 67 regions
-- Wishlist page
-- Nanobot chat widget (bottom-right corner)
-
-**Nanobot:**
-- MCP tools that query the backend API (`GET /games`, search, cheapest)
-- Answers questions: "show me cheap games", "find Elden Ring", "what RPG games do you have?"
-- Connected to Qwen via qwen-code-api
-
-**Deliverable:** Fully functional price catalog — games are auto-imported, users browse + compare prices + ask nanobot.
+**Deliverable:** Basic catalog with manually entered games — functional but not automated.
 
 ---
 
-### Version 2 — Enhanced Experience
+### Version 2 — Automated PS Store Aggregator
 
-**Builds on V1:**
-- Price history chart on game page
-- Price drop notifications for wishlist items (email or in-app)
-- Export price list to CSV
-- Side-by-side game comparison
-- Deploy to a public URL (VPS + Caddy with HTTPS)
+**What changed:**
+- Automated price import from PSPricing API (67 regions, every 12 hours)
+- User registration & authentication (JWT tokens)
+- Wishlist — save games to personal profile
+- Nanobot assistant with MCP tools:
+  - `list_games` — query the full catalog
+  - `search_games` — find specific games
+  - `list_games_by_genre` — filter by genre
+  - `cheapest_games` — find budget deals
+- Direct PS Store links for each region — users can go straight to the purchase page
+- AI assistant works with real catalog data, not generic knowledge
+- Caddy reverse proxy with WebSocket support for nanobot
+- Responsive design with mobile-friendly chat
 
-**New backend features:**
-- Price history tracking table
-- Notification service for wishlist items
-- User accounts with enhanced profiles
-
-**New frontend features:**
-- Price history chart on game page
-- Notifications center
-- Export button (CSV)
-- Comparison view for two games
-
-**Nanobot improvements:**
-- "Which game dropped in price the most?"
-- "Notify me when God of War goes on sale"
-- "Compare Elden Ring and Baldur's Gate 3 prices"
-
-**Deliverable:** Public-facing PS Store price comparator with price history, notifications, and deployed availability.
+**Deliverable:** Fully automated PS Store price comparator with user accounts, wishlist, AI assistant that queries real data, and direct purchase links for 67 regions.
 
 ---
 
 ## Architecture
 
 ```
-Version 1:
+Version 2:
 
   [User Browser] ──→ [Caddy :42002] ──→ [Next.js User Panel]
                         │                    │
@@ -84,13 +70,15 @@ Version 1:
                         │                    │
                         ├──────────────→ [Nanobot Gateway]
                         │                       │
-                        │                  [Qwen Code API]
+                        │              [Qwen Code API (LLM)]
+                        │                       │
+                        │              [MCP: game-catalog tools]
                         │
                         ├──────────────→ [FastAPI Backend]
                         │                       │
                         │                  [PostgreSQL]
                         │                       │
-                        │              [PSPricing API (ETL)]
+                        │         [PSPricing API (ETL every 12h)]
                         │
-                        └──────────────→ [Admin Panel (future)]
+                        └──────────────→ [pgAdmin (DB management)]
 ```
