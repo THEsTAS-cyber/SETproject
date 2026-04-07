@@ -5,9 +5,8 @@ Compare PlayStation Store game prices across 67 regions worldwide — find the b
 ## Demo
 
 > *Screenshots will be added after deployment:*
-> 1. Homepage — PS4/PS5 game catalog with prices
-> 2. Game page — price comparison across all regions
-> 3. Wishlist / Favorites page
+> 1. Game page — price comparison across all regions
+> 2. Wishlist / Favorites page
 
 ## Product Context
 
