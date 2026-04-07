@@ -73,7 +73,6 @@ A unified catalog that **automatically collects prices** from 67 PS Store region
 
 Click the 💬 button in the bottom-right corner and ask, for example:
 - *"Show me cheap games"*
-- *"Find Elden Ring"*
 - *"What RPG games are available?"*
 
 ## Deployment
