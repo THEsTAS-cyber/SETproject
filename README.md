@@ -88,6 +88,8 @@
 
 ### Step-by-Step Instructions
 
+To use AI assistent you need to authorize your account in nanobot in QWEN and have .qwen/oauth_creds.json file
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/THEsTAS-cyber/SETproject.git
