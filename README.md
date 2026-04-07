@@ -4,9 +4,9 @@ Compare PlayStation Store game prices across 67 regions worldwide — find the b
 
 ## Demo
 
-> *Screenshots will be added after deployment:*
-> 1. Game page — price comparison across all regions
-> 2. Wishlist / Favorites page
+> 1. Game page — price comparison across all regions <img width="1919" height="1199" alt="Screenshot1" src="https://github.com/user-attachments/assets/9b4e0b11-97f6-4d6d-a674-13c82dc304b3" />
+> 2. Wishlist / Favorites page <img width="1910" height="1194" alt="Screenshot2" src="https://github.com/user-attachments/assets/2459554c-ba5f-4a64-adb8-6384e059101d" />
+
 
 ## Product Context
 
